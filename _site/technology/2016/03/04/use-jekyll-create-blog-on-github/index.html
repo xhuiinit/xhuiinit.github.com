@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="java开发-移动开发-大数据">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+
+    <title>Jekyll本地搭建开发环境以及Github部署流程 - JAVA开发、架构</title>
+
+    <link rel="canonical" href="http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">拉风二大爷</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">ABOUT</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/images/home-bg.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/images/home-bg.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#jekyll" title="jekyll">jekyll</a>
+                        
+                    </div>
+                    <h1>Jekyll本地搭建开发环境以及Github部署流程</h1>
+                    
+                    
+                    <h2 class="subheading">使用Jekyll本地写博客，并部署到Github，绑定个人域名</h2>
+                    
+                    <span class="meta">Posted by pizida on March 4, 2016</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+			<ul id="markdown-toc">
+  <li><a href="#section" id="markdown-toc-section">前言</a></li>
+  <li><a href="#jekyll" id="markdown-toc-jekyll">本地搭建Jekyll</a>    <ul>
+      <li><a href="#gemjekyll" id="markdown-toc-gemjekyll">使用gem安装Jekyll</a></li>
+      <li><a href="#jekyll-1" id="markdown-toc-jekyll-1">使用Jekyll创建你的博客站点</a></li>
+      <li><a href="#jekyll-2" id="markdown-toc-jekyll-2">开启Jekyll服务</a></li>
+      <li><a href="#jekyll-3" id="markdown-toc-jekyll-3">使用Jekyll写博文</a></li>
+    </ul>
+  </li>
+  <li><a href="#github-pages" id="markdown-toc-github-pages">使用Github pages服务生成个人博客</a>    <ul>
+      <li><a href="#section-1" id="markdown-toc-section-1">创建我们的仓库</a></li>
+      <li><a href="#github-pages-1" id="markdown-toc-github-pages-1">为仓库创建Github Pages</a></li>
+      <li><a href="#jekyllgithub" id="markdown-toc-jekyllgithub">将本地jekyll代码部署到Github上的仓库</a></li>
+      <li><a href="#section-2" id="markdown-toc-section-2">克隆仓库到本地</a></li>
+      <li><a href="#jekyll-4" id="markdown-toc-jekyll-4">拷贝本地的jekyll目录到版本库</a></li>
+      <li><a href="#jekyllgithub-pages" id="markdown-toc-jekyllgithub-pages">本地Jekyll站点部署到Github Pages上（相当于线上环境）</a></li>
+      <li><a href="#usernamegithubio" id="markdown-toc-usernamegithubio">为username.github.io绑定个性域名</a></li>
+    </ul>
+  </li>
+  <li><a href="#section-3" id="markdown-toc-section-3">总结</a>    <ul>
+      <li><a href="#section-4" id="markdown-toc-section-4">本地开发：</a></li>
+      <li><a href="#section-5" id="markdown-toc-section-5">发布线上</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="section">前言</h2>
+<p>博客从wordpres迁移到Jekyll上来了，整个过程还是很顺利的。Jekyll是什么？它是一个简单静态博客生成工具，为什么是静态，因为它是不需要数据库的，通过<a href="http://wowubuntu.com/markdown/">markdown</a>编写静态文件，生成Html页面，它的优点是提升了页面的响应速度，并且让博主可以只专注于写文章，不用再去考虑如何排版（markdown语法很好的解决了排版问题）。那么为什么要迁移到Jekyll呢？不是因为跟风，也不是为了提高自我，完全就是瞎折腾！</p>
+
+<h2 id="jekyll">本地搭建Jekyll</h2>
+<p>本次安装可以MacOS或Linux下进行。</p>
+
+<h3 id="gemjekyll">使用gem安装Jekyll</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">gem</span> <span class="n">install</span> <span class="n">jekyll</span>
+</code></pre>
+</div>
+<p>这样就把jekyll安装完成了。
+如果本地没有gem，那么需要先安装Ruby和gem，这里就不介绍了。</p>
+
+<h3 id="jekyll-1">使用Jekyll创建你的博客站点</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">jekyll</span> <span class="kp">new</span> <span class="n">blog</span>  <span class="c1">#创建你的站点</span>
+</code></pre>
+</div>
+<p>控制台可以看见类似 <code class="highlighter-rouge">New jekyll site installed in /home/user/blog.</code>的提示</p>
+
+<h3 id="jekyll-2">开启Jekyll服务</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">cd</span> <span class="n">blog</span>    	 <span class="c1">#进入blog目录,记得一定要进入创建的目录，否则服务无法开启</span>
+<span class="n">jekyll</span> <span class="n">serve</span> 	 <span class="c1">#启动你的http服务 </span>
+</code></pre>
+</div>
+
+<p>本地服务开启后，Jekyll服务默认端口是4000，所以我打开浏览器，输入：<a href="http://localhost:4000">http://localhost:4000</a> 即可访问</p>
+
+<h3 id="jekyll-3">使用Jekyll写博文</h3>
+<p>我们进入blog目录后，会发现Jekyl的结构如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">.</span>
+<span class="err">├</span> <span class="n">about</span><span class="p">.</span><span class="nf">md</span>
+<span class="err">├</span> <span class="n">_config</span><span class="p">.</span><span class="nf">yml</span>
+<span class="err">├</span> <span class="n">css</span>
+<span class="err">│  </span> <span class="err">└</span> <span class="n">main</span><span class="p">.</span><span class="nf">scss</span>
+<span class="err">├</span> <span class="n">feed</span><span class="p">.</span><span class="nf">xml</span>
+<span class="err">├</span> <span class="n">_includes</span>
+<span class="err">│  </span> <span class="err">├</span> <span class="n">footer</span><span class="p">.</span><span class="nf">html</span>
+<span class="err">│  </span> <span class="err">├</span> <span class="n">header</span><span class="p">.</span><span class="nf">html</span>
+<span class="err">│  </span> <span class="err">├</span> <span class="n">head</span><span class="p">.</span><span class="nf">html</span>
+<span class="err">│  </span> <span class="err">├</span> <span class="n">icon</span><span class="o">-</span><span class="n">github</span><span class="p">.</span><span class="nf">html</span>
+<span class="err">│  </span> <span class="err">├</span> <span class="n">icon</span><span class="o">-</span><span class="n">github</span><span class="p">.</span><span class="nf">svg</span>
+<span class="err">│  </span> <span class="err">├</span> <span class="n">icon</span><span class="o">-</span><span class="n">twitter</span><span class="p">.</span><span class="nf">html</span>
+<span class="err">│  </span> <span class="err">└</span> <span class="n">icon</span><span class="o">-</span><span class="n">twitter</span><span class="p">.</span><span class="nf">svg</span>
+<span class="err">├</span> <span class="n">index</span><span class="p">.</span><span class="nf">html</span>
+<span class="err">├</span> <span class="n">_layouts</span>
+<span class="err">│  </span> <span class="err">├</span> <span class="n">default</span><span class="p">.</span><span class="nf">html</span>
+<span class="err">│  </span> <span class="err">├</span> <span class="n">page</span><span class="p">.</span><span class="nf">html</span>
+<span class="err">│  </span> <span class="err">└</span> <span class="n">post</span><span class="p">.</span><span class="nf">html</span>
+<span class="err">├</span> <span class="n">_posts</span>
+<span class="err">│  </span> <span class="err">└</span> <span class="mi">2016</span><span class="o">-</span><span class="mo">03</span><span class="o">-</span><span class="mo">04</span><span class="o">-</span><span class="n">welcome</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">jekyll</span><span class="p">.</span><span class="nf">markdown</span>
+<span class="err">└</span> <span class="n">_sass</span>
+    
+    <span class="err">├</span> <span class="n">_layout</span><span class="p">.</span><span class="nf">scss</span>
+    <span class="err">└</span> <span class="n">_syntax</span><span class="o">-</span><span class="n">highlighting</span><span class="p">.</span><span class="nf">scss</span>
+
+</code></pre>
+</div>
+<p>我们进入_post目录，撰写的markdown语法的博文都放在这里。默认会有一篇测试文章：2016-03-04-welcome-to-jekyll.markdown.
+拷贝测试博文</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">cp</span> <span class="mi">2016</span><span class="o">-</span><span class="mo">03</span><span class="o">-</span><span class="mo">04</span><span class="o">-</span><span class="n">welcome</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">jekyll</span><span class="p">.</span><span class="nf">markdown</span> <span class="mi">2016</span><span class="o">-</span><span class="mo">03</span><span class="o">-</span><span class="mo">04</span><span class="o">-</span><span class="nb">test</span><span class="p">.</span><span class="nf">markdown</span>
+</code></pre>
+</div>
+
+<p>然后刷新一下浏览器、发现页面并没有变化.因为我们还没有通过Jekyll build去生成。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">jekyll</span> <span class="n">build</span>
+</code></pre>
+</div>
+<p>默认情况下，服务会以前台的方式挂起，如果希望用后台进程运行服务，我们可以使用 <code class="highlighter-rouge">--detach</code>参数，缩写参数为<code class="highlighter-rouge">-B</code>(应该是Background的首字母)</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">jekyll</span> <span class="n">serve</span> <span class="n">build</span> <span class="o">--</span><span class="n">detach</span>
+</code></pre>
+</div>
+<p>或者</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">jekyll</span> <span class="n">serve</span> <span class="n">build</span> <span class="o">-</span><span class="no">B</span>
+</code></pre>
+</div>
+<p><strong>值得注意的是：如果用vagrant虚拟机去安装jekyll，那么启动服务时还需要加上-H参数，指定访问主机号为0.0.0.0，即<code class="highlighter-rouge">jekyll serve build -B -H 0.0.0.0</code>,否则vagrant下可能启动失败</strong></p>
+
+<p>再查看首页，发现已经有两篇文章了！因为没有更改标题，所以都是一样的。
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_D8F5893E-CBEB-4F56-A2A8-125929F64B3A.png" />
+好的，打开复制的 2016-03-04-test.markdown-test.markdown,可以看见开头有如下几个东东。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">---</span>
+<span class="ss">layout: </span><span class="n">post</span>
+<span class="ss">title:  </span><span class="s2">"Welcome to Jekyll!"</span>
+<span class="ss">date:   </span><span class="mi">2016</span><span class="o">-</span><span class="mo">03</span><span class="o">-</span><span class="mo">04</span> <span class="mi">10</span><span class="p">:</span><span class="mi">52</span><span class="p">:</span><span class="mi">19</span> <span class="o">+</span><span class="mo">0100</span>
+<span class="ss">categories: </span><span class="n">jekyll</span> <span class="n">update</span>
+<span class="o">---</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">layout</code>表示使用的是post布局，<code class="highlighter-rouge">title</code>是文章标题，<code class="highlighter-rouge">date</code>是自动生成的日期，<code class="highlighter-rouge">categories</code>是该文章生成html文件后存放的目录，可以去_site/jekyll/update下找到对应日期下面的html文档。当然你也可以只设置jekyll单一的目录，甚至是更多级别的目录，用空格分开即可。头信息设置完成后就可以书写正文了。</p>
+
+<p>如果每次都输入这些头信息，还要去整理格式，那么一定很烦躁，这种重复性的东西我们就把它自动化，通过Rakefile去解决，它类似shell这样的脚本，可以使用交互模式。以下是我的Rakefile,可以复制后命名为Rakefile，放在站点根目录直接使用，也可以修改为适合自己的Rakefile：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">task</span> <span class="ss">:default</span> <span class="o">=&gt;</span> <span class="ss">:new</span>
+
+<span class="nb">require</span> <span class="s1">'fileutils'</span>
+
+<span class="n">desc</span> <span class="s2">"创建新 post"</span>
+<span class="n">task</span> <span class="ss">:new</span> <span class="k">do</span>
+  <span class="nb">puts</span> <span class="s2">"请输入要创建的 post URL："</span>
+	<span class="vi">@url</span> <span class="o">=</span> <span class="no">STDIN</span><span class="p">.</span><span class="nf">gets</span><span class="p">.</span><span class="nf">chomp</span>
+	<span class="nb">puts</span> <span class="s2">"请输入 post 标题："</span>
+	<span class="vi">@name</span> <span class="o">=</span> <span class="no">STDIN</span><span class="p">.</span><span class="nf">gets</span><span class="p">.</span><span class="nf">chomp</span>
+	<span class="nb">puts</span> <span class="s2">"请输入 post 子标题："</span>
+	<span class="vi">@subtitle</span> <span class="o">=</span> <span class="no">STDIN</span><span class="p">.</span><span class="nf">gets</span><span class="p">.</span><span class="nf">chomp</span>
+	<span class="nb">puts</span> <span class="s2">"请输入 post 分类，以空格分隔："</span>
+	<span class="vi">@categories</span> <span class="o">=</span> <span class="no">STDIN</span><span class="p">.</span><span class="nf">gets</span><span class="p">.</span><span class="nf">chomp</span>
+	<span class="nb">puts</span> <span class="s2">"请输入 post 标签："</span>
+	<span class="vi">@tag</span> <span class="o">=</span> <span class="no">STDIN</span><span class="p">.</span><span class="nf">gets</span><span class="p">.</span><span class="nf">chomp</span>
+	<span class="vi">@slug</span> <span class="o">=</span> <span class="s2">"</span><span class="si">#{</span><span class="vi">@url</span><span class="si">}</span><span class="s2">"</span>
+	<span class="vi">@slug</span> <span class="o">=</span> <span class="vi">@slug</span><span class="p">.</span><span class="nf">downcase</span><span class="p">.</span><span class="nf">strip</span><span class="p">.</span><span class="nf">gsub</span><span class="p">(</span><span class="s1">' '</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">)</span>
+	<span class="vi">@date</span> <span class="o">=</span> <span class="no">Time</span><span class="p">.</span><span class="nf">now</span><span class="p">.</span><span class="nf">strftime</span><span class="p">(</span><span class="s2">"%F"</span><span class="p">)</span>
+	<span class="vi">@post_name</span> <span class="o">=</span> <span class="s2">"_posts/</span><span class="si">#{</span><span class="vi">@date</span><span class="si">}</span><span class="s2">-</span><span class="si">#{</span><span class="vi">@slug</span><span class="si">}</span><span class="s2">.md"</span>
+	<span class="k">if</span> <span class="no">File</span><span class="p">.</span><span class="nf">exist?</span><span class="p">(</span><span class="vi">@post_name</span><span class="p">)</span>
+			<span class="nb">abort</span><span class="p">(</span><span class="s2">"文件名已经存在！创建失败"</span><span class="p">)</span>
+	<span class="k">end</span>
+	<span class="no">FileUtils</span><span class="p">.</span><span class="nf">touch</span><span class="p">(</span><span class="vi">@post_name</span><span class="p">)</span>
+	<span class="nb">open</span><span class="p">(</span><span class="vi">@post_name</span><span class="p">,</span> <span class="s1">'a'</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span>
+			<span class="n">file</span><span class="p">.</span><span class="nf">puts</span> <span class="s2">"---"</span>
+			<span class="n">file</span><span class="p">.</span><span class="nf">puts</span> <span class="s2">"layout: post"</span>
+			<span class="n">file</span><span class="p">.</span><span class="nf">puts</span> <span class="s2">"title: </span><span class="si">#{</span><span class="vi">@name</span><span class="si">}</span><span class="s2">"</span>
+			<span class="n">file</span><span class="p">.</span><span class="nf">puts</span> <span class="s2">"subtitle: </span><span class="si">#{</span><span class="vi">@subtitle</span><span class="si">}</span><span class="s2">"</span>
+			<span class="n">file</span><span class="p">.</span><span class="nf">puts</span> <span class="s2">"author: pizida"</span>
+			<span class="n">file</span><span class="p">.</span><span class="nf">puts</span> <span class="s2">"date: </span><span class="si">#{</span><span class="no">Time</span><span class="p">.</span><span class="nf">now</span><span class="si">}</span><span class="s2">"</span>
+			<span class="n">file</span><span class="p">.</span><span class="nf">puts</span> <span class="s2">"categories: </span><span class="si">#{</span><span class="vi">@categories</span><span class="si">}</span><span class="s2">"</span>
+			<span class="n">file</span><span class="p">.</span><span class="nf">puts</span> <span class="s2">"tag: </span><span class="si">#{</span><span class="vi">@tag</span><span class="si">}</span><span class="s2">"</span>
+			<span class="n">file</span><span class="p">.</span><span class="nf">puts</span> <span class="s2">"---"</span>
+	<span class="k">end</span>
+	<span class="nb">exec</span> <span class="s2">"vi </span><span class="si">#{</span><span class="vi">@post_name</span><span class="si">}</span><span class="s2">"</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+<p>如何使用Rake，输入一下命令：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">rake</span> <span class="kp">new</span>
+</code></pre>
+</div>
+<p>rake会启动交互模式，让你依次输入title，subtitle，author，categories，tag等信息，并为你创建好具有头信息的markdown文件。如下一样:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>请输入要创建的 post URL：
+testurl
+请输入 post 标题：
+testpost
+请输入 post 子标题：
+subtitle    
+请输入 post 分类，以空格分隔：
+jekyll
+请输入 post 标签：
+技术
+</code></pre>
+</div>
+<p>我们查看<code class="highlighter-rouge">_post</code>目录，发现已经有一篇<strong>2016-03-05-testurl.md</strong>文章，打开看下</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">---</span>
+<span class="ss">layout: </span><span class="n">post</span>
+<span class="ss">title: </span><span class="n">testpost</span>
+<span class="ss">subtitle: </span><span class="n">subtitle</span>
+<span class="ss">author: </span><span class="n">pizida</span>
+<span class="ss">date: </span><span class="mi">2016</span><span class="o">-</span><span class="mo">03</span><span class="o">-</span><span class="mo">05</span> <span class="mo">07</span><span class="p">:</span><span class="mi">31</span><span class="p">:</span><span class="mi">27</span> <span class="o">+</span><span class="mi">0800</span>
+<span class="ss">categories: </span><span class="n">jekyll</span>
+<span class="ss">tag: </span><span class="err">技术</span>
+<span class="o">---</span>
+</code></pre>
+</div>
+<p>已经为我们创建好头信息了。</p>
+
+<p>本地搭建jekyll和写博文大致就是如此，有更多疑问可到官网<a href="https://jekyllrb.com/">https://jekyllrb.com/</a>或中文镜像站<a href="http://jekyllcn.com/">http://jekyllcn.com/</a>查阅资料。</p>
+
+<hr />
+
+<h2 id="github-pages">使用Github pages服务生成个人博客</h2>
+
+<h3 id="section-1">创建我们的仓库</h3>
+<p>我们repository name设置为username.github.com(这里的username是指你在Github上的用户名，我的用户名是engine-go,后面的<strong>username</strong>均指的是个人账户，不再做说明)，选择<strong>Public</strong>仓库类型:
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_C4D37F64-A0AD-4EEB-88A8-36BCB6DED2EA.png" alt="创建git仓库" /></p>
+
+<h3 id="github-pages-1">为仓库创建Github Pages</h3>
+<p>创建仓库后，选择<strong>setting</strong>
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_123.png" alt="创建Github Pages" /></p>
+
+<p>点击<strong>Launch automatic page generator</strong>
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_3F514A8A-3464-47B5-89AE-61FF6BC665B8.png" alt="生成pages" /></p>
+
+<p>然后编辑下标题和描述，任意选择一个模板，点击<strong>Publish</strong>
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_1.png" /></p>
+
+<p>如此，我们已经可以通过浏览器输入 http://username.github.io访问博客主页。那么我就访问engine-go.github.com。
+如下图所示，就是你的博客首页。
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_FABD47CE-F2EC-4ECA-93C7-18517303F939.png" /></p>
+
+<h3 id="jekyllgithub">将本地jekyll代码部署到Github上的仓库</h3>
+<p>前面我们已经详细地说明如何搭建Jekyll，我们可以在本地开发测试，推送代码到仓库，发布到线上。</p>
+
+<h3 id="section-2">克隆仓库到本地</h3>
+<p>请确保本地安装了git客户端，克隆你的username.github.com仓库到本地。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">git</span> <span class="nb">clone</span> <span class="n">https</span><span class="ss">:/</span><span class="o">/</span><span class="n">github</span><span class="p">.</span><span class="nf">com</span><span class="o">/</span><span class="n">username</span><span class="o">/</span><span class="n">username</span><span class="p">.</span><span class="nf">github</span><span class="p">.</span><span class="nf">com</span><span class="p">.</span><span class="nf">git</span>
+</code></pre>
+</div>
+
+<p>此时你会看见当前存在username.github.com这个目录，我们启动jekyll服务（启动前确保其他目录下没有jekyll服务，可以<code class="highlighter-rouge">ps aux|grep jekyll</code>查看进程,有的话,用<code class="highlighter-rouge">kill -9 进程号</code>杀掉）:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">cd</span> <span class="n">username</span><span class="p">.</span><span class="nf">github</span><span class="p">.</span><span class="nf">com</span>
+<span class="n">jekyll</span> <span class="n">serve</span> <span class="o">-</span><span class="no">B</span>
+</code></pre>
+</div>
+
+<p>现在我们打开<a href="localhost:4000">http://localhost:4000</a>,即可看见我们在Github上创建的主页，理论上和http://username.github.com  访问的应该是一模一样的。</p>
+
+<h3 id="jekyll-4">拷贝本地的jekyll目录到版本库</h3>
+<p>删除username.github.com下面的示例文件(README.md,不要删除，绑定域名会用到):</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">rm</span> <span class="o">-</span><span class="n">rf</span> <span class="n">_site</span> <span class="n">index</span><span class="p">.</span><span class="nf">html</span> <span class="n">params</span><span class="p">.</span><span class="nf">json</span>  <span class="n">stylesheets</span>
+</code></pre>
+</div>
+
+<p>拷贝本地blog(这个是前面本地搭建的blog，后续等同，不再说明)下的所有目录及文件到username.github.com</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">cp</span> <span class="o">-</span><span class="n">r</span> <span class="n">blog</span><span class="o">/*</span> <span class="n">username</span><span class="p">.</span><span class="nf">github</span><span class="p">.</span><span class="nf">com</span>
+</code></pre>
+</div>
+<p>重启服务，就可以在本地看见jekyll的站点页面了。</p>
+
+<h3 id="jekyllgithub-pages">本地Jekyll站点部署到Github Pages上（相当于线上环境）</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">git</span> <span class="n">add</span> <span class="o">--</span><span class="n">all</span>			   <span class="c1">#添加到暂存区	</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="o">-</span><span class="n">m</span> <span class="s2">"提交jekyll默认页面"</span> <span class="c1">#提交到本地仓库</span>
+<span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">master</span>    	   <span class="c1">#线上的站点是部署在master下面的</span>
+</code></pre>
+</div>
+<p>稍等10分钟左右，Github Pages有一定时间缓存,我们刷新username.github.io看看,已经ok了！
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_D9ADB28B-F0C7-4ADE-957C-90F9682956CF.png" />
+现在已经可以在本地blog下写文章，然后通过git推送到远程仓库，大家可以通过http://username.github.io/访问你的站点了</p>
+
+<h3 id="usernamegithubio">为username.github.io绑定个性域名</h3>
+<p>写博客的朋友一般都有自己的域名，请根据以下方法设置：</p>
+
+<ol>
+  <li>我们要绑定的话需要在username.github.com目录下增加一个CNAME文件。
+在里面添加你的域名，假设为example.com，然后推送CNAME文件到远程仓库:</li>
+</ol>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">git</span> <span class="n">add</span> <span class="no">CNAME</span>
+<span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">master</span>
+</code></pre>
+</div>
+<ol>
+  <li>
+    <p>到域名服务商增加你的CNAME记录。
+添加两条记录，@和www的主机记录，记录类型为CNAME类型，CNAME表示别名记录，该记录可以将多个名字映射到同一台计算机。
+记录值请写<strong>username.github.io.</strong>,值得注意的是<code class="highlighter-rouge">io</code>后面还有一个圆点，切记。
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_E1A2BE7C-E031-4379-AC65-57A1570518CF.png" /></p>
+  </li>
+  <li>
+    <p>过个几分钟，刷新博客，我的博客域名是pizida.com，就能直接访问了，不截图了。</p>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="section-3">总结</h2>
+<p>本文介绍了Jekyll本地搭建过程和远程部署Jekyll的流程，我们梳理一下思路，以后可这样开发以及发布到线上：</p>
+
+<h3 id="section-4">本地开发：</h3>
+<ol>
+  <li>通过<code class="highlighter-rouge">jekyll serve -B</code>启动服务，使用Rakefile创建文章，然后用自己喜欢的工具进行写作。</li>
+  <li>创作完成，通过<code class="highlighter-rouge">jekyll build</code>生成页面，本地localhost:4000查看文章。</li>
+</ol>
+
+<h3 id="section-5">发布线上</h3>
+<ol>
+  <li>本地确认文章无误，可以通过<code class="highlighter-rouge">git add</code>,<code class="highlighter-rouge">git commit</code>,<code class="highlighter-rouge">git push</code>等git命令推送文章到Github Pages服务器。</li>
+  <li>通过绑定的域名，查看线上文章，这个时候大家都能访问了。</li>
+</ol>
+
+<p>有说得不对的地方，请多多指教。</p>
+
+
+                <hr>
+		<p>转载请注明出处，本文地址:<a href="http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github/">http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github/</a></p>
+
+                
+                <!-- 多说 Share start -->
+                </style>
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/technology/2016/03/04/use-jekyll-create-blog-on-github"
+                    data-title="Jekyll本地搭建开发环境以及Github部署流程"
+                    data-url="http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github/"
+                    data-images="http://xhuiinit.github.io//images/home-bg.jpg"
+                    data-content="
+  前言
+  本地搭建Jekyll    
+      使用gem安装Jekyll
+      使用Jekyll创建你的博客站点
+      开启Jek... | JAVA开发、架构 " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2015/01/29/high-concurrency-oversold/" data-toggle="tooltip" data-placement="top" title="Redis高并发产生超卖现象">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/technology/2016/03/15/how-to-solve-cross-origin/" data-toggle="tooltip" data-placement="top" title="Access-Control-Allow-Origin跨域现象分析及解决方案">Next Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/technology/2016/03/04/use-jekyll-create-blog-on-github"
+                        data-title="Jekyll本地搭建开发环境以及Github部署流程"
+                        data-url="http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+                
+
+                
+
+            </div>
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+                				<a href="/tags/#redis" title="redis" rel="1">
+                                    redis
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#jekyll" title="jekyll" rel="2">
+                                    jekyll
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#技术" title="技术" rel="1">
+                                    技术
+                                </a>
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                        <li><a href="http://xhuiinit.github.io">init's blog</a></li>
+                    
+                        <li><a href="#">friend</a></li>
+                    
+                        <li><a href="#">It helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    // dynamic User by Hux
+    var _user = 'xhui';
+
+    // duoshuo comment query.
+    var duoshuoQuery = {short_name: _user };
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<!-- 多说公共JS代码 end -->
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("http://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/zhang-xiang-51-86">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+
+
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; 拉风二大爷 2016
+                    <br>
+                    Theme by Hux
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/javascripts/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/javascripts/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/javascripts/hux-blog.min.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- Highlight.js -->
+<script>
+    async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+        hljs.initHighlightingOnLoad();
+    })
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/javascripts/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+<link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+
+<!--fastClick.js -->
+<script>
+    async("http://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'http://xhuiinit.github.io';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = '040ab86f3ffe91c85aa1eafa18c124c0';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/images/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="java开发-移动开发-大数据">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+
+    <title>Access-Control-Allow-Origin跨域现象分析及解决方案 - JAVA开发、架构</title>
+
+    <link rel="canonical" href="http://xhuiinit.github.io//technology/2016/03/15/how-to-solve-cross-origin/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">拉风二大爷</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">ABOUT</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/images/home-bg.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/images/home-bg.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#技术" title="技术">技术</a>
+                        
+                    </div>
+                    <h1>Access-Control-Allow-Origin跨域现象分析及解决方案</h1>
+                    
+                    
+                    <h2 class="subheading">XMLHttpRequest cannot load的跨域问题以及解决方案</h2>
+                    
+                    <span class="meta">Posted by pizida on March 15, 2016</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+			<ul id="markdown-toc">
+  <li><a href="#section" id="markdown-toc-section">什么是跨域</a></li>
+  <li><a href="#section-1" id="markdown-toc-section-1">跨域现象剖析</a>    <ul>
+      <li><a href="#section-2" id="markdown-toc-section-2">实验一：协议、域名相同，端口号不同</a></li>
+      <li><a href="#section-3" id="markdown-toc-section-3">实验二：协议、端口相同，域名不同</a></li>
+      <li><a href="#section-4" id="markdown-toc-section-4">实验三：协议、端口相同，一个是子域名，一个是主域名</a></li>
+      <li><a href="#section-5" id="markdown-toc-section-5">实验四：协议、端口、域名相同，目录不同</a></li>
+      <li><a href="#ip" id="markdown-toc-ip">实验五：协议、端口相同,一个是域名，另一个是域名对应的ip</a></li>
+      <li><a href="#xmlhttprequest" id="markdown-toc-xmlhttprequest">实验六：XMLHttpRequest请求同源接口，后端控制跨域访问</a></li>
+    </ul>
+  </li>
+  <li><a href="#xmlhttprequest-1" id="markdown-toc-xmlhttprequest-1">XMLHttpRequest跨域的解决方案</a>    <ul>
+      <li><a href="#header" id="markdown-toc-header">解决方案一：修改访问服务器的header，跳过同源策略限制。</a></li>
+      <li><a href="#scriptjsonp" id="markdown-toc-scriptjsonp">解决方案二：动态创建script（俗称JSONP）</a>        <ul>
+          <li><a href="#js" id="markdown-toc-js">实例1：跨域读取js文件</a></li>
+          <li><a href="#section-6" id="markdown-toc-section-6">实例2：跨域获取服务器的简单数据</a></li>
+          <li><a href="#calback" id="markdown-toc-calback">实例3：传递calback参数，服务器动态返回回调函数名</a></li>
+          <li><a href="#jqueryjsonp" id="markdown-toc-jqueryjsonp">实例4：通过jQuery封装的JSONP进行跨域通信（业界常用）</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#section-7" id="markdown-toc-section-7">总结</a></li>
+</ul>
+
+<h2 id="section">什么是跨域</h2>
+<p>谈跨域概念之前，我们应该讲讲<code class="highlighter-rouge">同源策略</code>这个东西。同源策略是现代浏览器为了安全性问题而制定的一种安全策略,该策略限制了一个源（origin）中加载文本或脚本与来自其它源（origin）中资源的交互方式，请记住是交互方式。WIKI上有详细说明：<a href="https://en.wikipedia.org/wiki/Same-origin_policy">Same-origin policy</a></p>
+
+<p>那么我们用人话来说，什么是同源策略？那就是如果有两个页面或请求来源，它们具有相同的<code class="highlighter-rouge">协议</code>，<code class="highlighter-rouge">端口</code>,<code class="highlighter-rouge">主机</code>，那么这两个页面就是同源，符合同源策略。这样子，跨域就十分好理解了，只要违背了同源策略的标准，有一个因素出现不同，那么这两个页面就跨域。</p>
+
+<p>我们用表格列出跨域例子：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">页面1</th>
+      <th style="text-align: center">页面2</th>
+      <th style="text-align: center">说明</th>
+      <th style="text-align: center">是否允许通信</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">http://www.t.com/a.js</td>
+      <td style="text-align: center">http://www.t.com/b.js</td>
+      <td style="text-align: center">不同的js文件</td>
+      <td style="text-align: center">允许通信</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">http://www.t.com/a/a.js</td>
+      <td style="text-align: center">http://www.t.com/b/b.js</td>
+      <td style="text-align: center">不同文件夹下的js文件</td>
+      <td style="text-align: center">允许通信</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">http://www.t.com<code class="highlighter-rouge">:80</code>/a.js</td>
+      <td style="text-align: center">http://www.t.com<code class="highlighter-rouge">:8080</code>/b.js</td>
+      <td style="text-align: center"><strong>端口不同</strong></td>
+      <td style="text-align: center">不允许通信</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="highlighter-rouge">http:</code>//www.t.com/a.js</td>
+      <td style="text-align: center"><code class="highlighter-rouge">https:</code>//www.t.comb.js</td>
+      <td style="text-align: center"><strong>协议不同</strong></td>
+      <td style="text-align: center">不允许通信</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">http://<code class="highlighter-rouge">www.t.com</code>/a.js</td>
+      <td style="text-align: center">http://<code class="highlighter-rouge">www.tt.com</code>/b.js</td>
+      <td style="text-align: center"><strong>主机不同</strong></td>
+      <td style="text-align: center">不允许通信</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">http://<code class="highlighter-rouge">www.t.com</code>/a.js</td>
+      <td style="text-align: center">http://<code class="highlighter-rouge">192.168.204.69</code>/b.js</td>
+      <td style="text-align: center"><strong>主机和主机对应的ip</strong></td>
+      <td style="text-align: center">不允许通信</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">http://<code class="highlighter-rouge">www.t.com</code>/a.js</td>
+      <td style="text-align: center">http://<code class="highlighter-rouge">t.com</code>/b.js</td>
+      <td style="text-align: center"><strong>子域名和主域名</strong></td>
+      <td style="text-align: center">不允许通信</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="section-1">跨域现象剖析</h2>
+<p>了解概念后，我们看看跨域到底会带来怎么样的现象</p>
+
+<h3 id="section-2">实验一：协议、域名相同，端口号不同</h3>
+<p>准备条件：本地创建两个web服务，一个是80端口，一个是8080端口。
+本地新建<code class="highlighter-rouge">jsonp.html</code>,<code class="highlighter-rouge">cross80.php</code>,<code class="highlighter-rouge">cross8080.php</code>。
+其中<code class="highlighter-rouge">jsonp.html</code>,<code class="highlighter-rouge">cross80.php</code>放在80端口web目录下，<code class="highlighter-rouge">cross8080.php</code>放在8080端口web目录下。</p>
+
+<p>说明：实验一将显示全部代码，后面实验只显示核心代码。</p>
+
+<ol>
+  <li>首先我们访问通过AJAX访问cross80.php.</li>
+</ol>
+
+<p>jsonp.html代码如下 (为了集中描述跨域问题，我们这里使用jQuery)：</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">		<span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+				
+				<span class="kd">var</span> <span class="nx">request_url</span> <span class="o">=</span> <span class="s2">"http://localhost:80/cross80.php"</span><span class="p">;</span>
+				<span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+					<span class="na">type</span><span class="p">:</span><span class="s1">'get'</span><span class="p">,</span>
+					<span class="na">url</span><span class="p">:</span><span class="nx">request_url</span><span class="p">,</span>
+					<span class="na">dataType</span><span class="p">:</span><span class="s2">"json"</span><span class="p">,</span>
+					<span class="na">success</span><span class="p">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+						<span class="nx">alert</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">msg</span><span class="p">);</span>
+					<span class="p">}</span>
+				<span class="p">});</span>
+		<span class="p">});</span></code></pre></figure>
+
+<p>cross.php 代码如下：</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+	<span class="nv">$return_data</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">'msg'</span><span class="o">=&gt;</span><span class="s1">'success!'</span><span class="p">);</span>
+	<span class="k">echo</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$return_data</span><span class="p">);</span></code></pre></figure>
+
+<p>我们打开浏览器，访问http://localhost:80/cross80.php，浏览器会弹窗。输出<strong>success！</strong>。</p>
+
+<ol>
+  <li>然后我们访问cross8080.php</li>
+</ol>
+
+<p><code class="highlighter-rouge">cross8080.php</code>和<code class="highlighter-rouge">cros80.php</code>保持一模一样</p>
+
+<p>jsonp.html中的访问地址修改为http://localhost:8080/cross8080.php</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>                <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+
+                                <span class="kd">var</span> <span class="nx">request_url</span> <span class="o">=</span> <span class="s2">"http://localhost:8080/cross8080.php"</span><span class="p">;</span>
+                                <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+                                        <span class="na">type</span><span class="p">:</span><span class="s1">'get'</span><span class="p">,</span>
+                                        <span class="na">url</span><span class="p">:</span><span class="nx">request_url</span><span class="p">,</span>
+                                        <span class="na">dataType</span><span class="p">:</span><span class="s2">"json"</span><span class="p">,</span>
+                                        <span class="na">success</span><span class="p">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+                                                <span class="nx">alert</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">msg</span><span class="p">);</span>
+                                        <span class="p">}</span>
+                                <span class="p">});</span>
+                <span class="p">});</span>
+</code></pre>
+</div>
+<p>我们发现，浏览器没有弹窗，查看chrome控制台，显示一下结果：
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_QQ%E5%9B%BE%E7%89%8720160315185609.png" />
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_QQ%E5%9B%BE%E7%89%8720160315185631.png" /></p>
+
+<p>图片截得太小，我把提示打出来:</p>
+
+<blockquote>XMLHttpRequest cannot load http://localhost:8080/cross8080.php. 
+No 'Access-Control-Allow-Origin' header is present on the requested resource. 
+Origin 'http://localhost' is therefore not allowed access.</blockquote>
+
+<p>提示已经说得很清楚，我翻译一下:XMLHttpRequest无法加载cross8080.php这个文件，因为端口号不同，这逼跨域了,根据浏览器同源策略，不给予访问。</p>
+
+<h3 id="section-3">实验二：协议、端口相同，域名不同</h3>
+<p>准备域名：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">www.test1.com</code></li>
+  <li><code class="highlighter-rouge">www.test2.com</code></li>
+</ul>
+
+<p>准备页面：</p>
+
+<p>jsonp.html 代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">request_url</span> <span class="o">=</span> <span class="s2">"http://www.test1.com/test/test1.php"</span><span class="p">;</span>
+</code></pre>
+</div>
+<ul>
+  <li>http://www.test1.com/jsonp.html</li>
+  <li>
+    <p>http://www.test1.com/<code class="highlighter-rouge">test</code>/test1.php</p>
+  </li>
+  <li>jsonp.html,test1.php(放在www.test1.com上)</li>
+  <li>test2.php(放在www.test2.com上)</li>
+</ul>
+
+<p>1.访问test1.php</p>
+
+<p>jsonp.html 代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">request_url</span> <span class="o">=</span> <span class="s2">"http://www.test1.com/test1.php"</span><span class="p">;</span>
+</code></pre>
+</div>
+<p>test1.php 代码：</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+        <span class="nv">$return_data</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">'msg'</span><span class="o">=&gt;</span><span class="s1">'success!'</span><span class="p">);</span>
+        <span class="k">echo</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$return_data</span><span class="p">);</span></code></pre></figure>
+
+<p>结果：浏览器正常弹框，显示<strong>success!</strong></p>
+
+<p>2.请求test2.php</p>
+
+<p>jsonp.html 代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">request_url</span> <span class="o">=</span> <span class="s2">"http://www.test2.com/test2.php"</span><span class="p">;</span>
+</code></pre>
+</div>
+<p>test1.php 代码：</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+        <span class="nv">$return_data</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">'msg'</span><span class="o">=&gt;</span><span class="s1">'success!'</span><span class="p">);</span>
+        <span class="k">echo</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$return_data</span><span class="p">);</span></code></pre></figure>
+
+<p>我们先直接打开test2.php,界面显示如下：
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_2016-03-16_114223.png" />
+说明test2.php是可以正常访问的。</p>
+
+<p>我们通过jsonp.html去访问看看,显示如下：
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_2016-03-16_114702.png" />
+图中提示和实验一的是一模一样的，</p>
+<blockquote>XMLHttpRequest cannot load http://www.test2.com/test2.php. No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://www.test1.com' is therefore not allowed access.</blockquote>
+<p>因为跨域问题，所以不能访问到test2.php脚本。
+结果：不弹窗。端口（都是80）相同，协议相同，域名不同也是违反了同源策略。</p>
+
+<h3 id="section-4">实验三：协议、端口相同，一个是子域名，一个是主域名</h3>
+<p>准备页面：</p>
+
+<ul>
+  <li>http://www.test1.com/jsonp.html</li>
+  <li>http://test1.com/test1.php</li>
+</ul>
+
+<p>显示提示如下：</p>
+<blockquote>XMLHttpRequest cannot load http://test1.com/test1.php. No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://www.test1.com' is therefore not allowed access.</blockquote>
+
+<p>结果：不弹窗。说明子域名和主域名也不能通过XMLHttpRequest进行通信。</p>
+
+<h3 id="section-5">实验四：协议、端口、域名相同，目录不同</h3>
+<p>准备页面：</p>
+
+<ul>
+  <li>http://www.test1.com/jsonp.html</li>
+  <li>http://www.test1.com/<code class="highlighter-rouge">test</code>/test1.php</li>
+</ul>
+
+<p>jsonp.html 代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">request_url</span> <span class="o">=</span> <span class="s2">"http://www.test1.com/test/test1.php"</span><span class="p">;</span>    
+</code></pre>
+</div>
+
+<p>结果：弹窗，显示<strong>succes!</strong>。说明不同目录不受同源策略限制。</p>
+
+<h3 id="ip">实验五：协议、端口相同,一个是域名，另一个是域名对应的ip</h3>
+
+<p>准备页面：</p>
+
+<ul>
+  <li>http://<strong>IP</strong>/jsonp.html</li>
+  <li>http://www.test1.com/test1.php</li>
+</ul>
+
+<p>提示如下：</p>
+<blockquote>XMLHttpRequest cannot load http://www.test1.com/test1.php. No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://IP' is therefore not allowed access.</blockquote>
+
+<p>结果：主机对应的ip和主机名也违法了同源策略。</p>
+
+<h3 id="xmlhttprequest">实验六：XMLHttpRequest请求同源接口，后端控制跨域访问</h3>
+
+<p>准备页面：</p>
+
+<ul>
+  <li>http://www.test1.com/jsonp.html</li>
+  <li>http://www.test1.com/test1.php</li>
+</ul>
+
+<p>jsonp.html</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">request_url</span> <span class="o">=</span> <span class="s2">"http://www.test1.com/test/test1.php"</span><span class="p">;</span>
+</code></pre>
+</div>
+<p>test1.php</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+	<span class="nv">$url</span> <span class="o">=</span> <span class="s2">"http://www.baidu.com"</span><span class="p">;</span>
+	<span class="nb">header</span><span class="p">(</span><span class="s2">"Location:"</span><span class="o">.</span><span class="nv">$url</span><span class="p">);</span>
+        <span class="nv">$return_data</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">'msg'</span><span class="o">=&gt;</span><span class="s1">'success!'</span><span class="p">);</span>
+        <span class="k">echo</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$return_data</span><span class="p">);</span></code></pre></figure>
+
+<p>提示如下：</p>
+<blockquote>XMLHttpRequest cannot load http://www.baidu.com. No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://www.test1.com' is therefore not allowed access.</blockquote>
+
+<p>因为后端脚本更改了header的Locaiton,更改了当前访问源头。
+我们尝试把修改一下<code class="highlighter-rouge">$url</code>,</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+        <span class="nv">$url</span> <span class="o">=</span> <span class="s2">"http://www.test1.com/test2.php"</span><span class="p">;</span>
+        <span class="nb">header</span><span class="p">(</span><span class="s2">"Location:"</span><span class="o">.</span><span class="nv">$url</span><span class="p">);</span>
+        <span class="nv">$return_data</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">'msg'</span><span class="o">=&gt;</span><span class="s1">'success!'</span><span class="p">);</span>
+        <span class="k">echo</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$return_data</span><span class="p">);</span></code></pre></figure>
+
+<p>并且，我们创建一个test2.php文件
+然后访问jsonp.html页面，此时正常跳转到test2.php页面。显示如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+<span class="nl">msg</span><span class="p">:</span> <span class="s2">"success!"</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+<p>结果：后端修改header的Location字段时，当跳转的url非同源时，将会跨域。</p>
+
+<h2 id="xmlhttprequest-1">XMLHttpRequest跨域的解决方案</h2>
+
+<h3 id="header">解决方案一：修改访问服务器的header，跳过同源策略限制。</h3>
+
+<p>增加HTTP响应头的<strong>Access-Control-Allow-Origin</strong>,如果需要跨域请求，那么请求的服务器响应头可以返回如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Access-Control-Allow-Origin: <span class="nt">&lt;origin&gt;</span> | *
+</code></pre>
+</div>
+
+<p>举个例子，如果我们允许来自http://baidu.com的请求，可以这样设定：</p>
+<blockquote>Access-Control-Allow-Origin: http://baidu.com</blockquote>
+
+<p>如果允许任何域的请求，可以这样设定：</p>
+<blockquote>Access-Control-Allow-Origin: *</blockquote>
+
+<p>各个语言的实现：</p>
+
+<p>PHP中实现：</p>
+
+<p>允许任何域请求：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>header('Access-Control-Allow-Origin: *');  
+</code></pre>
+</div>
+
+<p>允许特定域请求</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>header('Access-Control-Allow-Origin: http://pizida.com');
+</code></pre>
+</div>
+
+<p>Java中实现：</p>
+
+<p>允许任何域请求：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">response</span><span class="o">.</span><span class="na">addHeader</span><span class="o">(</span><span class="s">"Access-Control-Allow-Origin"</span><span class="o">,</span> <span class="s">"*"</span><span class="o">);</span>
+</code></pre>
+</div>
+
+<p>允许特定域请求</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">response</span><span class="o">.</span><span class="na">addHeader</span><span class="o">(</span><span class="s">"Access-Control-Allow-Origin"</span><span class="o">,</span> <span class="s">"http://pizida.com"</span><span class="o">);</span>
+</code></pre>
+</div>
+
+<p>ASP.NET中实现</p>
+
+<p>允许任何域请求：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> <span class="n">filterContext</span><span class="o">.</span><span class="na">RequestContext</span><span class="o">.</span><span class="na">HttpContext</span><span class="o">.</span><span class="na">Response</span><span class="o">.</span><span class="na">AddHeader</span><span class="o">(</span><span class="s">"Access-Control-Allow-Origin"</span><span class="o">,</span> <span class="s">"*"</span><span class="o">);</span>
+        <span class="n">base</span><span class="o">.</span><span class="na">OnActionExecuting</span><span class="o">(</span><span class="n">filterContext</span><span class="o">);</span>
+</code></pre>
+</div>
+
+<p>允许特定域请求</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> <span class="n">filterContext</span><span class="o">.</span><span class="na">RequestContext</span><span class="o">.</span><span class="na">HttpContext</span><span class="o">.</span><span class="na">Response</span><span class="o">.</span><span class="na">AddHeader</span><span class="o">(</span><span class="s">"Access-Control-Allow-Origin"</span><span class="o">,</span> <span class="s">"http://pizida.com"</span><span class="o">);</span>
+        <span class="n">base</span><span class="o">.</span><span class="na">OnActionExecuting</span><span class="o">(</span><span class="n">filterContext</span><span class="o">);</span>
+</code></pre>
+</div>
+
+<p>结论：</p>
+
+<ul>
+  <li>优点：方便快捷。</li>
+  <li>缺点：缺乏安全性；需要有服务器的控制权，如果是第三方提供的接口不一定可以使用。</li>
+</ul>
+
+<h3 id="scriptjsonp">解决方案二：动态创建script（俗称JSONP）</h3>
+
+<p>要使用动态创建script来解决问题，首先了解一下几点：</p>
+
+<ul>
+  <li>我们通过前面的实验已经了解到在js中通过XMLHttpRequest进行跨域请求不允许</li>
+  <li>但是浏览器允许引用js文件，还有更多的标签允许跨域内嵌：
+    <ol>
+      <li><code class="highlighter-rouge">&lt;script src="..." &gt;&lt;/script&gt;</code>标签嵌入跨域脚本。语法错误信息只能在同源脚本中捕捉到。</li>
+      <li><code class="highlighter-rouge">&lt;link rel="stylesheet" href="..."&gt;</code>标签嵌入CSS</li>
+      <li><code class="highlighter-rouge">&lt;img&gt;</code>嵌入图片</li>
+      <li><code class="highlighter-rouge">&lt;video&gt;</code> 和 <code class="highlighter-rouge">&lt;audio&gt;</code>嵌入多媒体资源</li>
+      <li><code class="highlighter-rouge">@font-face</code>引入的字体</li>
+      <li><code class="highlighter-rouge">&lt;frame&gt;</code> 和 <code class="highlighter-rouge">&lt;iframe&gt;</code>载入的任何资源</li>
+    </ol>
+  </li>
+  <li>JSON是一种用来描述数据结构的简单方式，和XML一样，却又更简洁。</li>
+</ul>
+
+<p>这样，我们是否可以用一种方法让服务端返回具有JSON格式的数据，JSON中包含script将会使用的函数或方法，然后在页面嵌入这些·<script>·，达到调用目标函数的目的，从而进行跨域通信。
+说了这些，我们还是实践一下为妙！</script></p>
+
+<h4 id="js">实例1：跨域读取js文件</h4>
+
+<p>现在localhost:<code class="highlighter-rouge">80</code>上有一个jsonp.html页面，localhost:<code class="highlighter-rouge">8080</code>上有一个test.js页面
+jsonp.html代码如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">"http://localhost:8080/test.js"</span><span class="o">&gt;&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span></code></pre>
+</div>
+
+<p>test.js代码如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nx">alert</span><span class="p">(</span><span class="s1">'Hello World!'</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<p>现在刷新浏览器，显示如下：
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_2016-03-17_115854.jpg" /></p>
+
+<p>你们知道肯定会弹窗的了，对不对？上面说了<code class="highlighter-rouge">script</code>标签嵌入浏览器是支持的，并且这是一种很流行的做法。我们的确通过这种做法引用了其他域的资源，获得了数据。那么我们是否可以同样地获取更多的后端数据呢？</p>
+
+<h4 id="section-6">实例2：跨域获取服务器的简单数据</h4>
+
+<p>同样，在localhost:<code class="highlighter-rouge">80</code>上有一个jsonp.html页面，这次localhost:<code class="highlighter-rouge">8080</code>上换成一个test.php文件。</p>
+
+<p>jsonp.html代码如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>	
+	<span class="kd">var</span> <span class="nx">my_alert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+		<span class="nx">alert</span><span class="p">(</span><span class="s1">'跨域获得数据，服务器传来的提示是：'</span><span class="o">+</span> <span class="nx">data</span><span class="p">.</span><span class="nx">msg</span><span class="p">);</span>
+	<span class="p">}</span>
+<span class="o">&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span>
+<span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">"http://localhost:8080/test.php"</span><span class="o">&gt;&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span></code></pre>
+</div>
+<p>实际上这里有两段js，第一段是声明客户端的函数，第二段是需要获取的服务端返回的数据（精妙之处就在这里！）
+我们就拿端口号不同从而造成跨域问题来解决：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>echo "my_alert({'msg':'80端口，你好！我是8080端口'})";
+</code></pre>
+</div>
+<p>我们因为知道了客户端定义的是<code class="highlighter-rouge">my_alert</code>函数，所以这里加上了改函数名，并且构建了一个JSON，里面有一个msg元素。</p>
+
+<p>刷新页面，显示如下：
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_2016-03-17_121825.jpg" /></p>
+
+<p>貌似已经可以成功跨域通信啦！但是我是事先知道<code class="highlighter-rouge">my_alert</code>函数名，如果不知道呢？那服务端如何处理，假设我还需要传递参数呢，服务端通过参数进行一系列逻辑呢？要如何实现？</p>
+
+<h4 id="calback">实例3：传递calback参数，服务器动态返回回调函数名</h4>
+
+<p>同样，在localhost:<code class="highlighter-rouge">80</code>上有一个jsonp.html页面，localhost:<code class="highlighter-rouge">8080</code>上是一个test.php文件。</p>
+
+<p>jsonp.html代码如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+		<span class="kd">var</span> <span class="nx">my_alert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+			<span class="nx">alert</span><span class="p">(</span><span class="s1">'查询到的商品是:'</span><span class="o">+</span><span class="nx">data</span><span class="p">.</span><span class="nx">product</span><span class="o">+</span><span class="s2">"，价格为："</span><span class="o">+</span><span class="nx">data</span><span class="p">.</span><span class="nx">price</span><span class="p">);</span>
+		<span class="p">}</span>
+   <span class="o">&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span>
+   <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">"http://localhost:8080/test.php?product=苹果&amp;callback=my_alert"</span><span class="o">&gt;&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span></code></pre>
+</div>
+
+<p>test.php代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$myFunction= $_GET['callback'];
+$product= $_GET['product'];
+
+//可以点业务逻辑什么的,获得了price
+
+$price=6888;
+
+echo "{$myFunction}({'product':'$product','price':'$price'})";
+exit;
+</code></pre>
+</div>
+
+<p>刷新页面，显示如下：
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_2016-03-17_132901.jpg" /></p>
+
+<p>现在我们把调用的函数通过calback传递过去，那么服务端就不用关心客户端到底是什么函数名了。同理，还能传递其他参数。</p>
+
+<p>这样子实际上就完成了嵌入script解决跨域问题。但是我们这样子写是不是太松散了，可否模块化处理呢？那就使用jQuery吧！</p>
+
+<h4 id="jqueryjsonp">实例4：通过jQuery封装的JSONP进行跨域通信（业界常用）</h4>
+
+<p>JSONP并没有什么高大上的地方，只是将我们前面几种实例封装起来，放进jQuery中供客户端调用。现在我们来实践一下吧。</p>
+
+<p>jsonp.html</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+	<span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+				
+			<span class="kd">var</span> <span class="nx">request_url</span> <span class="o">=</span> <span class="s2">"http://localhost:8080/test.php"</span><span class="p">;</span>
+
+			<span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+				<span class="na">type</span><span class="p">:</span><span class="s1">'get'</span><span class="p">,</span>		
+				<span class="na">url</span><span class="p">:</span><span class="nx">request_url</span><span class="p">,</span>
+				<span class="na">data</span><span class="p">:</span><span class="s1">'product=香蕉'</span><span class="p">,</span>
+				<span class="na">dataType</span><span class="p">:</span><span class="s2">"jsonp"</span><span class="p">,</span>	  <span class="c1">//返回的数据类型，定义为jsonp</span>
+				<span class="na">jsonp</span><span class="p">:</span><span class="s2">"callback"</span><span class="p">,</span>	  <span class="c1">//传给服务端的，为获得回调名称，默认为calllback</span>
+				<span class="na">jsonpCallback</span><span class="p">:</span><span class="s2">"my_alert"</span><span class="p">,</span> <span class="c1">//回调函数名称，可以不写</span>
+				<span class="na">success</span><span class="p">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+				    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+				<span class="p">}</span>
+			<span class="p">});</span>
+		<span class="p">});</span>
+
+<span class="o">&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span></code></pre>
+</div>
+<p>test.php我们不做任何修改。
+查看页面，如下：
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_2.jpg" />
+确定弹窗已经返回了香蕉，是我们代码中设置的。</p>
+
+<p>我们再看看请求过去的参数以及响应地址和端口，证明跨域访问成功：
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_QQ%E5%9B%BE%E7%89%8720160317142025.jpg" /></p>
+
+<p>最后看看console.log的内容是否正确：
+<img src="http://7xqfiw.com1.z0.glb.clouddn.com/blog_11.jpg" /></p>
+
+<h2 id="section-7">总结</h2>
+<ul>
+  <li>
+    <p>其实跨域问题解决起来十分简单，我们可以更改header响应实现，也可以通过动态嵌入script（也就是封装好的JSONP）。</p>
+  </li>
+  <li>
+    <p>JSONP是大家发挥聪明才智想出来的办法，也是业界最常用最方便的跨域解决方法。</p>
+  </li>
+  <li>
+    <p>现在相信大家看见<code class="highlighter-rouge">Access-Control-Allow-Origin</code>等字眼就再也不会陌生了。当然除了这两个方法，还有一些其他方案，例如<code class="highlighter-rouge">document.domain+iframe</code>的设置,<code class="highlighter-rouge">window.name</code>实现的跨域数据传输,使用<code class="highlighter-rouge">HTML5 postMessage</code>,利用<code class="highlighter-rouge">flash</code>,因为JSONP是最常用的，也是最实用的，其他方案就不展开了，大家可以自行研究。</p>
+  </li>
+  <li>
+    <p>本文后端语言完全可以换成其他，例如Java,Python,Ruby等都是可以的。</p>
+  </li>
+</ul>
+
+
+
+                <hr>
+		<p>转载请注明出处，本文地址:<a href="http://xhuiinit.github.io//technology/2016/03/15/how-to-solve-cross-origin/">http://xhuiinit.github.io//technology/2016/03/15/how-to-solve-cross-origin/</a></p>
+
+                
+                <!-- 多说 Share start -->
+                </style>
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/technology/2016/03/15/how-to-solve-cross-origin"
+                    data-title="Access-Control-Allow-Origin跨域现象分析及解决方案"
+                    data-url="http://xhuiinit.github.io//technology/2016/03/15/how-to-solve-cross-origin/"
+                    data-images="http://xhuiinit.github.io//images/home-bg.jpg"
+                    data-content="
+  什么是跨域
+  跨域现象剖析    
+      实验一：协议、域名相同，端口号不同
+      实验二：协议、端口相同，域名不同
+      实验... | JAVA开发、架构 " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/technology/2016/03/04/use-jekyll-create-blog-on-github/" data-toggle="tooltip" data-placement="top" title="Jekyll本地搭建开发环境以及Github部署流程">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/blog/jekyll/2016/04/29/20160429153210/" data-toggle="tooltip" data-placement="top" title="windows环境下安装jekyll开发环境">Next Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/technology/2016/03/15/how-to-solve-cross-origin"
+                        data-title="Access-Control-Allow-Origin跨域现象分析及解决方案"
+                        data-url="http://xhuiinit.github.io//technology/2016/03/15/how-to-solve-cross-origin/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+                
+
+                
+
+            </div>
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+                				<a href="/tags/#redis" title="redis" rel="1">
+                                    redis
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#jekyll" title="jekyll" rel="2">
+                                    jekyll
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#技术" title="技术" rel="1">
+                                    技术
+                                </a>
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                        <li><a href="http://xhuiinit.github.io">init's blog</a></li>
+                    
+                        <li><a href="#">friend</a></li>
+                    
+                        <li><a href="#">It helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    // dynamic User by Hux
+    var _user = 'xhui';
+
+    // duoshuo comment query.
+    var duoshuoQuery = {short_name: _user };
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<!-- 多说公共JS代码 end -->
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("http://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/zhang-xiang-51-86">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+
+
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; 拉风二大爷 2016
+                    <br>
+                    Theme by Hux
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/javascripts/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/javascripts/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/javascripts/hux-blog.min.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- Highlight.js -->
+<script>
+    async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+        hljs.initHighlightingOnLoad();
+    })
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/javascripts/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+<link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+
+<!--fastClick.js -->
+<script>
+    async("http://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'http://xhuiinit.github.io';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = '040ab86f3ffe91c85aa1eafa18c124c0';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/images/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

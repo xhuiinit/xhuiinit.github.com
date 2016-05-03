@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="java开发-移动开发-大数据">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+
+    <title>Redis高并发产生超卖现象 - JAVA开发、架构</title>
+
+    <link rel="canonical" href="http://xhuiinit.github.io//2015/01/29/high-concurrency-oversold.markdown/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">拉风二大爷</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/post-bg-2015.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/img/post-bg-2015.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#技术" title="技术">技术</a>
+                        
+                    </div>
+                    <h1>Redis高并发产生超卖现象</h1>
+                    
+                    
+                    <h2 class="subheading">高并发为什么带来超卖？什么是超卖现象？</h2>
+                    
+                    <span class="meta">Posted by pizida on January 29, 2015</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+			最近在开发一个抢红包的活动时候，由于并发导致了超卖的问题，导致发放的红包过多
+
+# 什么是超卖
+
+首先，它不是股市那个超卖，炒股的朋友可以关闭这个页面了。
+超卖就是卖出的商品超过了本来的库存。例如，你举办了一个秒杀活动，只要卖出1台iPhone 100S，但是现在有10个用户抢到了这个iPhone 100S。这个时候你需要卖出10台iPhone 100S。但你又没货，这就超卖了！
+
+# 产生超卖的原因
+
+系统发来了多个并发请求，同时判断当前限制是否超出库存（程序响应时间非常短），都判断出还有一个iPhone 100S，对每个用户都发送，最后超卖。
+
+# 超卖可能带来的后果
+
+1. 经济损失：无法给出10台 iPhone 100S，用户不满，告你欺诈，收到法院传票，赔偿受害者。
+2. 信任危机：用户这么难抢到100 台iPhone 100S，你说没有，他们感觉不会再爱。就比如你你买彩票，大奖号码和你的号码一模一样，后来，人家说，号码要错了。
+3. 关系紧张：同事关系紧张，领导对你的质疑。
+4. 上面三个其实都不重要，最最最最重要的是：年终奖的估值（严肃脸）  
+
+# 真实案例抢红包
+
+* 业务逻辑
+	+ 全服务器一起抢红包，发放的红包不固定	
+	+ 每个小时发放的金币是固定的100万
+	+ 每个整点前5分钟为开抢时间。（进一步加剧短时间内的高并发。。。）
+	+ 每个用户只能抢一次
+	+ 用户所获得的金币数是不固定的，需要经过一定业务逻辑然后随机金币。（这跟微信红包拼手气还不一样，因为拼手气红包本身已经确定是随机获取，既然逻辑固定，在用户没抢之前已经可以分配好金额入队，所以谁先谁后，完全没有关系。用户实际点击时，只需要判断用户是否获得过红包，没有的话即可发送预先安排好的红包，完全不会有并发情况，那就更没有所谓的超卖。）
+
+# 实际结果
+
+活动上线几个小时候，金币发放1500万，大大超过预期。查询DB数据，发现大量同一时间戳取得的结果（非微秒级别），证明产生了并发。看图
+
+![并发原因](http://7xqfiw.com1.z0.glb.clouddn.com/04140013_NzXS.jpg)
+
+*上图这种情况下，用户A获得了商品，用户B也获得了商品，这就是超卖现象。因为活动中用到了redis，redis本身是单线程的，出现超卖的原因是程序中抢红包的一系列操作应该是一个原子性的行为。每个用户都可以同时写入，redis本身并没有锁，需要自己去设计。好在redis提供了简单的事务控制。*
+
+# 高并发以及超卖现象的解决方案（纵向讨论，非分布式）
+
+1. 活动页面静态化，CDN处理技术
+  
+	尽量展示使用CDN提供高速反应，选择离用户最近的节点，减少应用服务器压力
+
+2. 过滤用户
+	
+	这里可以根据自身的业务逻辑和使用场景去设计，因为最终只要100万金币发放，肯定会有用户都抢不到，所以我们可以让部分用户进入活动，展示“红包已经抢完”。可以是单双号限制，等级高低限制，是否充值限制等等。当然也可以计算大概多少人的金币发放达到了100万，然后在这里排队，只允许多少人进来。
+
+3. 乐观锁（乐观锁控制，对实时要求并产生超卖的主要解决手段）
+
+	超卖现象可以使用乐观锁或者悲观锁解决问题，但是悲观锁对于并发性能不友好。这里我们使用redis的乐观锁进行处理。
+
+>乐观锁就是不相信数据会被修改，是一种更加宽松的锁机制。同一个数据所有请求都可以进行修改。每个请求都带一个版本号，如果操作结束和版本号不符，就禁止修改提交。
+
+redis提供了简单的事务处理机制，redis事务没有回滚功能，这必须手动实现； 
+
+事务中的watch就是典型的乐观锁。Redis 通过[MULTI](http://redisdoc.com/transaction/multi.html), [WATCH](http://redisdoc.com/transaction/watch.html), [UNWATCH](http://redisdoc.com/transaction/unwatch.html) , [EXEC](http://redisdoc.com/transaction/exec.html),[DISCARD](http://redisdoc.com/transaction/discard.html)四个命令来实现事务功能。
+
+# 核心代码
+ <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"> <span class="vg">$redis</span> <span class="o">=</span> <span class="kp">new</span> <span class="n">redis</span><span class="p">();</span>
+
+ <span class="vg">$result</span> <span class="o">=</span> <span class="vg">$redis</span><span class="o">-&gt;</span><span class="n">connect</span><span class="p">(</span><span class="s1">'localhost'</span><span class="p">,</span> <span class="mi">6379</span><span class="p">);</span>
+
+ <span class="vg">$total</span> <span class="o">=</span> <span class="vg">$redis</span><span class="o">-&gt;</span><span class="n">get</span><span class="p">(</span><span class="s2">"totalkey"</span><span class="p">);</span>
+
+ <span class="vg">$can_num</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+
+ <span class="k">if</span> <span class="p">(</span> <span class="vg">$total</span> <span class="o">&lt;</span><span class="vg">$can_num</span> <span class="p">){</span> 
+
+  <span class="c1">#监控发出去的红包总数  $redis-&gt;watch("totalkey");</span>
+
+  <span class="c1">#事务的开始</span>
+  <span class="vg">$redis</span><span class="o">-&gt;</span><span class="n">multi</span><span class="p">();</span>
+
+  <span class="c1">#设置被监控的key，如果在multi和exec之间对watch的key进行修改，</span>
+  <span class="c1">#那么exec将会返回nil</span>
+  <span class="vg">$redis</span><span class="o">-&gt;</span><span class="n">set</span><span class="p">(</span><span class="s2">"totalkey"</span><span class="p">,</span><span class="o">++</span><span class="vg">$total</span><span class="p">);</span>
+
+  <span class="c1">#提交事务。如果这时A和B都是限制范围内进来，A先监控了totalkey，然后提交。</span>
+  <span class="c1">#那么B在这一步将会提交失败。因为总量已被修改</span>
+  <span class="vg">$result</span> <span class="o">=</span> <span class="vg">$redis</span><span class="o">-&gt;</span><span class="nb">exec</span><span class="p">();</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="vg">$result</span><span class="p">){</span>
+    <span class="k">return</span> <span class="n">array</span><span class="p">(</span><span class="s1">'msg'</span><span class="o">=&gt;</span><span class="s1">'没有抢到红包哦，继续努力!'</span><span class="p">,</span><span class="s1">'count'</span><span class="o">=&gt;</span><span class="mi">0</span><span class="p">);</span>
+  <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+    <span class="vg">$count</span> <span class="o">=</span> <span class="n">mt_rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span><span class="c1">#在0到1000之间随机金币，逻辑自行丰富</span>
+    <span class="k">return</span> <span class="n">array</span><span class="p">(</span><span class="s1">'msg'</span><span class="o">=&gt;</span><span class="s1">'抢红包成功！'</span><span class="p">,</span><span class="s1">'count'</span><span class="o">=&gt;</span><span class="vg">$count</span><span class="p">);</span>
+  <span class="p">}</span>
+
+<span class="p">}</span></code></pre></figure>
+
+预期：乐观锁控制后，金币已经控制在100万多一点。属于正常范围内
+
+# 总结
+1. 抢红包类活动（秒杀，1元购等等）当然可以通过**`队列+延迟`**处理方式去解决，这是最完美的解决方案，但是因为业务逻辑，必须将金币实时发给用，所以可以通过悲观锁或乐观锁去解决问题。
+
+2. watch是redis中乐观锁的典型应用，它结合multi，exec等操作，可以将一系列的redis命令打包，然后发送给服务器。但是记住一系列的命令中又一个命令操作失败，redis是不会回滚的，其他命令照样可以执行成功。
+
+关于watch需要记住的：
+
+	1. 如果在事务块中所watch的key没有被当前请求修改或者被其他请求修改，exec都将返回失败；
+
+	2. 如果你watch了多个key，那么事务块中至少要有一个key被修改，否则exec也返回失败；
+
+
+
+                <hr>
+		<p>转载请注明出处，本文地址:<a href="http://xhuiinit.github.io//2015/01/29/high-concurrency-oversold.markdown/">http://xhuiinit.github.io//2015/01/29/high-concurrency-oversold.markdown/</a></p>
+
+                
+                <!-- 多说 Share start -->
+                </style>
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/2015/01/29/high-concurrency-oversold.markdown"
+                    data-title="Redis高并发产生超卖现象"
+                    data-url="http://xhuiinit.github.io//2015/01/29/high-concurrency-oversold.markdown/"
+                    data-images="http://xhuiinit.github.io//img/post-bg-2015.jpg"
+                    data-content="最近在开发一个抢红包的活动时候，由于并发导致了超卖的问题，导致发放的红包过多
+
+# 什么是超卖
+
+首先，它不是股市那个超卖，炒股的朋友可以关闭这个页面了。... | JAVA开发、架构 " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2015/01/29/high-concurrency-oversold/" data-toggle="tooltip" data-placement="top" title="Redis高并发产生超卖现象">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/technology/2016/03/04/use-jekyll-create-blog-on-github/" data-toggle="tooltip" data-placement="top" title="Jekyll本地搭建开发环境以及Github部署流程">Next Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/2015/01/29/high-concurrency-oversold.markdown"
+                        data-title="Redis高并发产生超卖现象"
+                        data-url="http://xhuiinit.github.io//2015/01/29/high-concurrency-oversold.markdown/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+                
+
+                
+
+            </div>
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+                				<a href="/tags/#技术" title="技术" rel="2">
+                                    技术
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#jekyll" title="jekyll" rel="2">
+                                    jekyll
+                                </a>
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                        <li><a href="http://xhuiinit.github.io">init's blog</a></li>
+                    
+                        <li><a href="#">friend</a></li>
+                    
+                        <li><a href="#">It helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    // dynamic User by Hux
+    var _user = 'pizida';
+
+    // duoshuo comment query.
+    var duoshuoQuery = {short_name: _user };
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<!-- 多说公共JS代码 end -->
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("http://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/zhang-xiang-51-86">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+
+
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; 拉风二大爷 2016
+                    <br>
+                    Theme by Hux
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/javascripts/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/javascripts/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/javascripts/hux-blog.min.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- Highlight.js -->
+<script>
+    async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+        hljs.initHighlightingOnLoad();
+    })
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/javascripts/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+<link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+
+<!--fastClick.js -->
+<script>
+    async("http://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'http://xhuiinit.github.io';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = '040ab86f3ffe91c85aa1eafa18c124c0';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/images/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
