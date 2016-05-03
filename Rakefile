@@ -26,11 +26,10 @@ task :new do
 			file.puts "layout: post"
 			file.puts "title: #{@name}"
 			file.puts "subtitle: #{@subtitle}"
-			file.puts "author: pizida"
+			file.puts "author: 拉风二大爷"
 			file.puts "date: #{Time.now}"
 			file.puts "categories: #{@categories}"
 			file.puts "tag: #{@tag}"
 			file.puts "---"
 	end
-	exec "vi #{@post_name}"
 end
