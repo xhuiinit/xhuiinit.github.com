@@ -1,2 +1,1 @@
-# xhuiinit.github.com
-my pages
+# 个人博客

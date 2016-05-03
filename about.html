@@ -1,0 +1,129 @@
+---
+layout: page
+title: "About"
+description: "Hey, this is pizida."
+header-img: "img/about-bg.jpg"
+---
+
+<!-- Language Selector -->
+<select onchange= "onLanChange(this.options[this.options.selectedIndex].value)">
+    <option value="0" selected> 中文 Chinese </option>
+    <option value="1"> 英语 English </option>
+</select>
+
+<!-- Chinese Version -->
+<div class="zh">
+    <p>嗨！你能来到这里很不容易。</p>
+
+    <p>我是痞子达，也可以叫我DaDa。我生活在深圳这个十夏二冬的城市，虽然它四季不太分明，但我还是莫名的喜爱。
+我毕业于<a href="http://www.jluzh.com">吉林大学珠海学院</a>，这是一所很美丽的大学，背山环海，鸟语花香。可能怪她太过美丽，于是乎四年不学无术，寻欢作乐，没有练啥手艺活。幸运的是，专业读的是CS中的软件工程，细分方向是软件设计与开发。现在的我就职于深圳南山某上市公司，在云计算部门负责后端开发工作，靠着绵薄之力苟且偷生。</p>
+     <p>
+	我是一个非典型的手艺人，不喜欢晚上工作，标准的白天型选手。无鱼不欢，深圳最喜欢的两种：柠檬鱼和探鱼。
+     	喜欢的运动很多，有篮球、游泳、跑步等,我是一个颜值忽低忽高的人。还有，摩羯座,嗯嗯。
+    </p>
+    <p>每个人小时候幻想过，自己将来要干什么或嫁给谁，我也不例外，曾经想过当警察、老师、医生、公务员、甚至科学家...，
+	没想到最后当了一个手艺人。我希望自己可以慢慢滴成为一个匠人。这是个很大滴梦想，前路必定是艰辛滴，曲折滴，痛苦滴。不过人活在世上，总得有点寄托。
+    </p>
+
+    <p>正如喜剧演员周星驰在《少林足球中》说的:<blockquote>做人如果無夢想，同條鹹魚有咩分別呀？</blockquote>
+    </p>
+
+    <p>世界很大，有机会我还是想出去看看，看看山川，看看人文，看看妹纸。</p>
+    <p>如果你还了解不够，可以邮件我：<a href="mailto:pizidago@gmail.com">pizidago@gmail.com</a></p>
+    
+</div>
+
+<!-- English Version -->
+<div class="en">
+    <blockquote>
+	The world is so big, I want to see.
+    </blockquote>
+
+    <p>
+    </p>
+
+    <p>
+    </p>
+
+
+</div>
+
+<!-- Handle Language Change -->
+<script type="text/javascript">
+    var $zh = document.querySelector(".zh");
+    var $en = document.querySelector(".en");
+    function onLanChange(index){
+        if(index == 0){
+            $zh.style.display = "block";
+            $en.style.display = "none";
+        }else{
+            $en.style.display = "block";
+            $zh.style.display = "none";
+        }
+    }
+    onLanChange(0);
+</script>
+
+
+
+{% if site.duoshuo_username %}
+<!-- 多说评论框 start -->
+<div class="comment">
+    <div class="ds-thread"
+    {% if site.duoshuo_username == "huxblog" %}
+        data-thread-id="1187623191091085319"
+    {% else %}
+        data-thread-key="{{site.duoshuo_username}}/about"
+    {% endif %}
+
+    data-title="{{page.title}}"
+    data-url="{{site.url}}/about/"></div>
+</div>
+<!-- 多说评论框 end -->
+
+<!-- Duoshuo hacking -->
+<input id="dsUser" type="hidden" value="{{site.duoshuo_username}}"  />
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    // dynamic User hacking by Hux
+    var _user = document.getElementById('dsUser').value;
+    // duoshuo comment query.
+    var duoshuoQuery = {short_name: _user };
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<!-- 多说公共JS代码 end -->
+{% endif %}
+
+
+{% if site.disqus_username %}
+<!-- disqus 评论框 start -->
+<div class="comment">
+    <div id="disqus_thread" class="disqus-thread">
+
+    </div>
+</div>
+<!-- disqus 评论框 end -->
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "{{site.disqus_username}}";
+    var disqus_identifier = "{{site.disqus_username}}/{{page.url}}";
+    var disqus_url = "{{site.url}}{{page.url}}";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+{% endif %}
