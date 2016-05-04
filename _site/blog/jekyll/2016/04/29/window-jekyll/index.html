@@ -11,9 +11,9 @@
     <meta name="keyword"  content="java开发-移动开发-大数据">
     <link rel="shortcut icon" href="/images/favicon.ico">
 
-    <title>Jekyll本地搭建开发环境以及Github部署流程 - JAVA开发、架构</title>
+    <title>111 - JAVA开发、架构</title>
 
-    <link rel="canonical" href="http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github/">
+    <link rel="canonical" href="http://xhuiinit.github.io//blog/jekyll/2016/04/29/window-jekyll/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -137,12 +137,12 @@
                         <a class="tag" href="/tags/#jekyll" title="jekyll">jekyll</a>
                         
                     </div>
-                    <h1>Jekyll本地搭建开发环境以及Github部署流程</h1>
+                    <h1>111</h1>
                     
                     
-                    <h2 class="subheading">使用Jekyll本地写博客，并部署到Github，绑定个人域名</h2>
+                    <h2 class="subheading">jekyll开发</h2>
                     
-                    <span class="meta">Posted by pizida on March 4, 2016</span>
+                    <span class="meta">Posted by 拉风二大爷 on April 29, 2016</span>
                 </div>
             </div>
         </div>
@@ -161,9 +161,11 @@
                 post-container">
 
 			<ul id="markdown-toc">
+  <li><a href="#ruby" id="markdown-toc-ruby">安装 Ruby</a></li>
+  <li><a href="#gemjekyll" id="markdown-toc-gemjekyll">使用gem安装Jekyll</a></li>
   <li><a href="#section" id="markdown-toc-section">前言</a></li>
   <li><a href="#jekyll" id="markdown-toc-jekyll">本地搭建Jekyll</a>    <ul>
-      <li><a href="#gemjekyll" id="markdown-toc-gemjekyll">使用gem安装Jekyll</a></li>
+      <li><a href="#gemjekyll-1" id="markdown-toc-gemjekyll-1">使用gem安装Jekyll</a></li>
       <li><a href="#jekyll-1" id="markdown-toc-jekyll-1">使用Jekyll创建你的博客站点</a></li>
       <li><a href="#jekyll-2" id="markdown-toc-jekyll-2">开启Jekyll服务</a></li>
       <li><a href="#jekyll-3" id="markdown-toc-jekyll-3">使用Jekyll写博文</a></li>
@@ -186,13 +188,33 @@
   </li>
 </ul>
 
+<p>Jekyll是一个静态网站生成工具。它允许用户使用HTML、Markdown或Textile来建立静态页面，然后通过模板引擎Liquid（Liquid Templating Engine）来运行.
+网上已经有很多jekyll的安装方法，（由于本人记性太差）此处仅记录下来以免忘记了。可共分为以下几个重要步骤：</p>
+
+<h2 id="ruby">安装 Ruby</h2>
+
+<p>Ruby下载地址：[download Ruby]</p>
+
+<p>在 “RubyInstallers” 部分，选择某个版本点击下载。 此处选择 Ruby 2.3.0 (x64)安装包。</p>
+
+<p>开始安装，这里我安装到C:\Ruby23-x64，记得安装过程中勾选<code class="highlighter-rouge">Add Ruby executables to your PATH</code>。</p>
+
+<p>打开命令提示符，输入<code class="highlighter-rouge">ruby -v</code>检测是否安装Ruby成功，如果输出<code class="highlighter-rouge">ruby 2.3.0p0 (2015-12-25 revision 53290) [x64-mingw32]</code>表示安装成功。</p>
+
+<h2 id="gemjekyll">使用gem安装Jekyll</h2>
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">cd</span> <span class="err">“</span><span class="no">C</span><span class="p">:\</span><span class="no">DevKit</span><span class="err">”</span>
+<span class="n">ruby</span> <span class="n">dk</span><span class="p">.</span><span class="nf">rb</span> <span class="n">init</span>
+<span class="n">notepad</span> <span class="n">config</span><span class="p">.</span><span class="nf">yml</span>
+</code></pre>
+</div>
+
 <h2 id="section">前言</h2>
 <p>博客从wordpres迁移到Jekyll上来了，整个过程还是很顺利的。Jekyll是什么？它是一个简单静态博客生成工具，为什么是静态，因为它是不需要数据库的，通过<a href="http://wowubuntu.com/markdown/">markdown</a>编写静态文件，生成Html页面，它的优点是提升了页面的响应速度，并且让博主可以只专注于写文章，不用再去考虑如何排版（markdown语法很好的解决了排版问题）。那么为什么要迁移到Jekyll呢？不是因为跟风，也不是为了提高自我，完全就是瞎折腾！</p>
 
 <h2 id="jekyll">本地搭建Jekyll</h2>
 <p>本次安装可以MacOS或Linux下进行。</p>
 
-<h3 id="gemjekyll">使用gem安装Jekyll</h3>
+<h3 id="gemjekyll-1">使用gem安装Jekyll</h3>
 <div class="highlighter-rouge"><pre class="highlight"><code><span class="n">gem</span> <span class="n">install</span> <span class="n">jekyll</span>
 </code></pre>
 </div>
@@ -471,23 +493,24 @@ jekyll
 
 
                 <hr>
-		<p>转载请注明出处，本文地址:<a href="http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github/">http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github/</a></p>
+		<p>转载请注明出处，本文地址:<a href="http://xhuiinit.github.io//blog/jekyll/2016/04/29/window-jekyll/">http://xhuiinit.github.io//blog/jekyll/2016/04/29/window-jekyll/</a></p>
 
                 
                 <!-- 多说 Share start -->
                 </style>
                 <div class="ds-share"
                     style="text-align: right"
-                    data-thread-key="/technology/2016/03/04/use-jekyll-create-blog-on-github"
-                    data-title="Jekyll本地搭建开发环境以及Github部署流程"
-                    data-url="http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github/"
+                    data-thread-key="/blog/jekyll/2016/04/29/window-jekyll"
+                    data-title="111"
+                    data-url="http://xhuiinit.github.io//blog/jekyll/2016/04/29/window-jekyll/"
                     data-images="http://xhuiinit.github.io//images/home-bg.jpg"
                     data-content="
+  安装 Ruby
+  使用gem安装Jekyll
   前言
   本地搭建Jekyll    
       使用gem安装Jekyll
-      使用Jekyll创建你的博客站点
-      开启Jek... | JAVA开发、架构 " >
+      使用... | JAVA开发、架构 " >
                     <div class="ds-share-inline">
                       <ul  class="ds-share-icons-16">
                         <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
@@ -507,12 +530,12 @@ jekyll
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/2015/01/29/high-concurrency-oversold/" data-toggle="tooltip" data-placement="top" title="Redis高并发产生超卖现象">&larr; Previous Post</a>
+                        <a href="/blog/jekyll/2016/04/29/20160429153210.md/" data-toggle="tooltip" data-placement="top" title="windows环境下安装jekyll开发环境">&larr; Previous Post</a>
                     </li>
                     
                     
                     <li class="next">
-                        <a href="/technology/2016/03/15/how-to-solve-cross-origin/" data-toggle="tooltip" data-placement="top" title="Access-Control-Allow-Origin跨域现象分析及解决方案">Next Post &rarr;</a>
+                        <a href="/blog/jekyll/2016/04/29/window-jekyll.md/" data-toggle="tooltip" data-placement="top" title="111">Next Post &rarr;</a>
                     </li>
                     
                 </ul>
@@ -522,9 +545,9 @@ jekyll
                 <!-- 多说评论框 start -->
                 <div class="comment">
                     <div class="ds-thread"
-                        data-thread-key="/technology/2016/03/04/use-jekyll-create-blog-on-github"
-                        data-title="Jekyll本地搭建开发环境以及Github部署流程"
-                        data-url="http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github/" >
+                        data-thread-key="/blog/jekyll/2016/04/29/window-jekyll"
+                        data-title="111"
+                        data-url="http://xhuiinit.github.io//blog/jekyll/2016/04/29/window-jekyll/" >
                     </div>
                 </div>
                 <!-- 多说评论框 end -->
@@ -554,7 +577,7 @@ jekyll
                             
         				
                             
-                				<a href="/tags/#jekyll" title="jekyll" rel="2">
+                				<a href="/tags/#jekyll" title="jekyll" rel="5">
                                     jekyll
                                 </a>
                             

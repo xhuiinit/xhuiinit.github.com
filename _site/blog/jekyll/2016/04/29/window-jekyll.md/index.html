@@ -5,14 +5,15 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
     <meta name="description" content="">
     <meta name="keyword"  content="java开发-移动开发-大数据">
     <link rel="shortcut icon" href="/images/favicon.ico">
 
-    <title>Jekyll本地搭建开发环境以及Github部署流程 - JAVA开发、架构</title>
+    <title>111 - JAVA开发、架构</title>
 
-    <link rel="canonical" href="http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github.md/">
+    <link rel="canonical" href="http://xhuiinit.github.io//blog/jekyll/2016/04/29/window-jekyll.md/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -72,7 +73,7 @@
                     </li>
                     
                     <li>
-                        <a href="/about/">About</a>
+                        <a href="/about/">ABOUT</a>
                     </li>
                     
                     <li>
@@ -133,15 +134,15 @@
                 <div class="post-heading">
                     <div class="tags">
                         
-                        <a class="tag" href="/tags/#技术 jekyll" title="技术 jekyll">技术 jekyll</a>
+                        <a class="tag" href="/tags/#jekyll" title="jekyll">jekyll</a>
                         
                     </div>
-                    <h1>Jekyll本地搭建开发环境以及Github部署流程</h1>
+                    <h1>111</h1>
                     
                     
-                    <h2 class="subheading">使用Jekyll本地写博客，并部署到Github，绑定个人域名</h2>
+                    <h2 class="subheading">jekyll开发</h2>
                     
-                    <span class="meta">Posted by pizida on March 4, 2016</span>
+                    <span class="meta">Posted by 拉风二大爷 on April 29, 2016</span>
                 </div>
             </div>
         </div>
@@ -162,6 +163,26 @@
 			* TOC
 {:toc}
 
+
+Jekyll是一个静态网站生成工具。它允许用户使用HTML、Markdown或Textile来建立静态页面，然后通过模板引擎Liquid（Liquid Templating Engine）来运行.
+网上已经有很多jekyll的安装方法，（由于本人记性太差）此处仅记录下来以免忘记了。可共分为以下几个重要步骤：
+
+## 安装 Ruby
+
+Ruby下载地址：[download Ruby]
+
+在 “RubyInstallers” 部分，选择某个版本点击下载。 此处选择 Ruby 2.3.0 (x64)安装包。
+
+开始安装，这里我安装到C:\Ruby23-x64，记得安装过程中勾选`Add Ruby executables to your PATH`。
+
+打开命令提示符，输入`ruby -v`检测是否安装Ruby成功，如果输出`ruby 2.3.0p0 (2015-12-25 revision 53290) [x64-mingw32]`表示安装成功。
+
+## 使用gem安装Jekyll
+ ```ruby
+cd “C:\DevKit”
+ruby dk.rb init
+notepad config.yml
+```
 
 ## 前言
   博客从wordpres迁移到Jekyll上来了，整个过程还是很顺利的。Jekyll是什么？它是一个简单静态博客生成工具，为什么是静态，因为它是不需要数据库的，通过<a href="http://wowubuntu.com/markdown/">markdown</a>编写静态文件，生成Html页面，它的优点是提升了页面的响应速度，并且让博主可以只专注于写文章，不用再去考虑如何排版（markdown语法很好的解决了排版问题）。那么为什么要迁移到Jekyll呢？不是因为跟风，也不是为了提高自我，完全就是瞎折腾！
@@ -437,23 +458,22 @@ git push origin master
 
 
                 <hr>
-		<p>转载请注明出处，本文地址:<a href="http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github.md/">http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github.md/</a></p>
+		<p>转载请注明出处，本文地址:<a href="http://xhuiinit.github.io//blog/jekyll/2016/04/29/window-jekyll.md/">http://xhuiinit.github.io//blog/jekyll/2016/04/29/window-jekyll.md/</a></p>
 
                 
                 <!-- 多说 Share start -->
                 </style>
                 <div class="ds-share"
                     style="text-align: right"
-                    data-thread-key="/technology/2016/03/04/use-jekyll-create-blog-on-github.md"
-                    data-title="Jekyll本地搭建开发环境以及Github部署流程"
-                    data-url="http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github.md/"
+                    data-thread-key="/blog/jekyll/2016/04/29/window-jekyll.md"
+                    data-title="111"
+                    data-url="http://xhuiinit.github.io//blog/jekyll/2016/04/29/window-jekyll.md/"
                     data-images="http://xhuiinit.github.io//images/home-bg.jpg"
                     data-content="* TOC
 {:toc}
 
 
-## 前言
-  博客从wordpres迁移到Jekyll上来了，整个过程还是很顺利的。Jekyll是什么？它是一个简单静态博... | JAVA开发、架构 " >
+Jekyll是一个静态网站生成工具。它允许用户使用HTML、Markdown或Textile来建立静态页面，然后通过模板引擎... | JAVA开发、架构 " >
                     <div class="ds-share-inline">
                       <ul  class="ds-share-icons-16">
                         <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
@@ -473,13 +493,9 @@ git push origin master
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/technology/2016/03/04/use-jekyll-create-blog-on-github/" data-toggle="tooltip" data-placement="top" title="Jekyll本地搭建开发环境以及Github部署流程">&larr; Previous Post</a>
+                        <a href="/blog/jekyll/2016/04/29/window-jekyll/" data-toggle="tooltip" data-placement="top" title="111">&larr; Previous Post</a>
                     </li>
                     
-                    
-                    <li class="next">
-                        <a href="/technology/2016/03/15/how-to-solve-cross-origin/" data-toggle="tooltip" data-placement="top" title="Access-Control-Allow-Origin跨域现象分析及解决方案">Next Post &rarr;</a>
-                    </li>
                     
                 </ul>
 
@@ -488,9 +504,9 @@ git push origin master
                 <!-- 多说评论框 start -->
                 <div class="comment">
                     <div class="ds-thread"
-                        data-thread-key="/technology/2016/03/04/use-jekyll-create-blog-on-github.md"
-                        data-title="Jekyll本地搭建开发环境以及Github部署流程"
-                        data-url="http://xhuiinit.github.io//technology/2016/03/04/use-jekyll-create-blog-on-github.md/" >
+                        data-thread-key="/blog/jekyll/2016/04/29/window-jekyll.md"
+                        data-title="111"
+                        data-url="http://xhuiinit.github.io//blog/jekyll/2016/04/29/window-jekyll.md/" >
                     </div>
                 </div>
                 <!-- 多说评论框 end -->
@@ -514,20 +530,20 @@ git push origin master
                     <div class="tags">
         				
                             
-                				<a href="/tags/#技术" title="技术" rel="2">
-                                    技术
+                				<a href="/tags/#redis" title="redis" rel="1">
+                                    redis
                                 </a>
                             
         				
                             
-                				<a href="/tags/#jekyll" title="jekyll" rel="2">
+                				<a href="/tags/#jekyll" title="jekyll" rel="5">
                                     jekyll
                                 </a>
                             
         				
                             
-                				<a href="/tags/#技术 jekyll" title="技术 jekyll" rel="2">
-                                    技术 jekyll
+                				<a href="/tags/#技术" title="技术" rel="1">
+                                    技术
                                 </a>
                             
         				
@@ -558,7 +574,7 @@ git push origin master
 <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
 <script type="text/javascript">
     // dynamic User by Hux
-    var _user = 'pizida';
+    var _user = 'xhui';
 
     // duoshuo comment query.
     var duoshuoQuery = {short_name: _user };

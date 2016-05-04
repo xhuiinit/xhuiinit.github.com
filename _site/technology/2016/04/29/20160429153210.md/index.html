@@ -5,14 +5,15 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
     <meta name="description" content="">
     <meta name="keyword"  content="java开发-移动开发-大数据">
     <link rel="shortcut icon" href="/images/favicon.ico">
 
-    <title>Redis高并发产生超卖现象 - JAVA开发、架构</title>
+    <title>windows环境下安装jekyll开发环境 - JAVA开发、架构</title>
 
-    <link rel="canonical" href="http://xhuiinit.github.io//2015/01/29/high-concurrency-oversold.markdown/">
+    <link rel="canonical" href="http://xhuiinit.github.io//technology/2016/04/29/20160429153210.md/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -72,7 +73,7 @@
                     </li>
                     
                     <li>
-                        <a href="/about/">About</a>
+                        <a href="/about/">ABOUT</a>
                     </li>
                     
                     <li>
@@ -118,12 +119,12 @@
 
     <!-- Image to hack wechat -->
 <!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
-<!-- <img src="/img/post-bg-2015.jpg" width="0" height="0"> -->
+<!-- <img src="/images/home-bg.jpg" width="0" height="0"> -->
 
 <!-- Post Header -->
 <style type="text/css">
     header.intro-header{
-        background-image: url('/img/post-bg-2015.jpg')
+        background-image: url('/images/home-bg.jpg')
     }
 </style>
 <header class="intro-header" >
@@ -133,15 +134,15 @@
                 <div class="post-heading">
                     <div class="tags">
                         
-                        <a class="tag" href="/tags/#技术" title="技术">技术</a>
+                        <a class="tag" href="/tags/#jekyll" title="jekyll">jekyll</a>
                         
                     </div>
-                    <h1>Redis高并发产生超卖现象</h1>
+                    <h1>windows环境下安装jekyll开发环境</h1>
                     
                     
-                    <h2 class="subheading">高并发为什么带来超卖？什么是超卖现象？</h2>
+                    <h2 class="subheading">jekyll开发</h2>
                     
-                    <span class="meta">Posted by pizida on January 29, 2015</span>
+                    <span class="meta">Posted by 拉风二大爷 on April 29, 2016</span>
                 </div>
             </div>
         </div>
@@ -159,125 +160,139 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-			最近在开发一个抢红包的活动时候，由于并发导致了超卖的问题，导致发放的红包过多
+			* TOC
+{:toc}
 
-# 什么是超卖
+Jekyll是一个静态网站生成工具。它允许用户使用HTML、Markdown或Textile来建立静态页面，然后通过模板引擎Liquid（Liquid Templating Engine）来运行.
 
-首先，它不是股市那个超卖，炒股的朋友可以关闭这个页面了。
-超卖就是卖出的商品超过了本来的库存。例如，你举办了一个秒杀活动，只要卖出1台iPhone 100S，但是现在有10个用户抢到了这个iPhone 100S。这个时候你需要卖出10台iPhone 100S。但你又没货，这就超卖了！
+网上已经有很多jekyll的安装方法，（由于本人记性太差）此处仅记录下来以免忘记了。
 
-# 产生超卖的原因
+共分为以下几个重要步骤：
 
-系统发来了多个并发请求，同时判断当前限制是否超出库存（程序响应时间非常短），都判断出还有一个iPhone 100S，对每个用户都发送，最后超卖。
+## 安装 Ruby
 
-# 超卖可能带来的后果
+   Ruby下载地址：[download Ruby]
 
-1. 经济损失：无法给出10台 iPhone 100S，用户不满，告你欺诈，收到法院传票，赔偿受害者。
-2. 信任危机：用户这么难抢到100 台iPhone 100S，你说没有，他们感觉不会再爱。就比如你你买彩票，大奖号码和你的号码一模一样，后来，人家说，号码要错了。
-3. 关系紧张：同事关系紧张，领导对你的质疑。
-4. 上面三个其实都不重要，最最最最重要的是：年终奖的估值（严肃脸）  
+   在 “RubyInstallers” 部分，选择某个版本点击下载。 此处选择 Ruby 2.3.0 (x64)安装包。
 
-# 真实案例抢红包
+   开始安装，这里我安装到C:\Ruby23-x64，记得安装过程中勾选`Add Ruby executables to your PATH`。
 
-* 业务逻辑
-	+ 全服务器一起抢红包，发放的红包不固定	
-	+ 每个小时发放的金币是固定的100万
-	+ 每个整点前5分钟为开抢时间。（进一步加剧短时间内的高并发。。。）
-	+ 每个用户只能抢一次
-	+ 用户所获得的金币数是不固定的，需要经过一定业务逻辑然后随机金币。（这跟微信红包拼手气还不一样，因为拼手气红包本身已经确定是随机获取，既然逻辑固定，在用户没抢之前已经可以分配好金额入队，所以谁先谁后，完全没有关系。用户实际点击时，只需要判断用户是否获得过红包，没有的话即可发送预先安排好的红包，完全不会有并发情况，那就更没有所谓的超卖。）
-
-# 实际结果
-
-活动上线几个小时候，金币发放1500万，大大超过预期。查询DB数据，发现大量同一时间戳取得的结果（非微秒级别），证明产生了并发。看图
-
-![并发原因](http://7xqfiw.com1.z0.glb.clouddn.com/04140013_NzXS.jpg)
-
-*上图这种情况下，用户A获得了商品，用户B也获得了商品，这就是超卖现象。因为活动中用到了redis，redis本身是单线程的，出现超卖的原因是程序中抢红包的一系列操作应该是一个原子性的行为。每个用户都可以同时写入，redis本身并没有锁，需要自己去设计。好在redis提供了简单的事务控制。*
-
-# 高并发以及超卖现象的解决方案（纵向讨论，非分布式）
-
-1. 活动页面静态化，CDN处理技术
-  
-	尽量展示使用CDN提供高速反应，选择离用户最近的节点，减少应用服务器压力
-
-2. 过滤用户
-	
-	这里可以根据自身的业务逻辑和使用场景去设计，因为最终只要100万金币发放，肯定会有用户都抢不到，所以我们可以让部分用户进入活动，展示“红包已经抢完”。可以是单双号限制，等级高低限制，是否充值限制等等。当然也可以计算大概多少人的金币发放达到了100万，然后在这里排队，只允许多少人进来。
-
-3. 乐观锁（乐观锁控制，对实时要求并产生超卖的主要解决手段）
-
-	超卖现象可以使用乐观锁或者悲观锁解决问题，但是悲观锁对于并发性能不友好。这里我们使用redis的乐观锁进行处理。
-
->乐观锁就是不相信数据会被修改，是一种更加宽松的锁机制。同一个数据所有请求都可以进行修改。每个请求都带一个版本号，如果操作结束和版本号不符，就禁止修改提交。
-
-redis提供了简单的事务处理机制，redis事务没有回滚功能，这必须手动实现； 
-
-事务中的watch就是典型的乐观锁。Redis 通过[MULTI](http://redisdoc.com/transaction/multi.html), [WATCH](http://redisdoc.com/transaction/watch.html), [UNWATCH](http://redisdoc.com/transaction/unwatch.html) , [EXEC](http://redisdoc.com/transaction/exec.html),[DISCARD](http://redisdoc.com/transaction/discard.html)四个命令来实现事务功能。
-
-# 核心代码
- <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"> <span class="vg">$redis</span> <span class="o">=</span> <span class="kp">new</span> <span class="n">redis</span><span class="p">();</span>
-
- <span class="vg">$result</span> <span class="o">=</span> <span class="vg">$redis</span><span class="o">-&gt;</span><span class="n">connect</span><span class="p">(</span><span class="s1">'localhost'</span><span class="p">,</span> <span class="mi">6379</span><span class="p">);</span>
-
- <span class="vg">$total</span> <span class="o">=</span> <span class="vg">$redis</span><span class="o">-&gt;</span><span class="n">get</span><span class="p">(</span><span class="s2">"totalkey"</span><span class="p">);</span>
-
- <span class="vg">$can_num</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
-
- <span class="k">if</span> <span class="p">(</span> <span class="vg">$total</span> <span class="o">&lt;</span><span class="vg">$can_num</span> <span class="p">){</span> 
-
-  <span class="c1">#监控发出去的红包总数  $redis-&gt;watch("totalkey");</span>
-
-  <span class="c1">#事务的开始</span>
-  <span class="vg">$redis</span><span class="o">-&gt;</span><span class="n">multi</span><span class="p">();</span>
-
-  <span class="c1">#设置被监控的key，如果在multi和exec之间对watch的key进行修改，</span>
-  <span class="c1">#那么exec将会返回nil</span>
-  <span class="vg">$redis</span><span class="o">-&gt;</span><span class="n">set</span><span class="p">(</span><span class="s2">"totalkey"</span><span class="p">,</span><span class="o">++</span><span class="vg">$total</span><span class="p">);</span>
-
-  <span class="c1">#提交事务。如果这时A和B都是限制范围内进来，A先监控了totalkey，然后提交。</span>
-  <span class="c1">#那么B在这一步将会提交失败。因为总量已被修改</span>
-  <span class="vg">$result</span> <span class="o">=</span> <span class="vg">$redis</span><span class="o">-&gt;</span><span class="nb">exec</span><span class="p">();</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="vg">$result</span><span class="p">){</span>
-    <span class="k">return</span> <span class="n">array</span><span class="p">(</span><span class="s1">'msg'</span><span class="o">=&gt;</span><span class="s1">'没有抢到红包哦，继续努力!'</span><span class="p">,</span><span class="s1">'count'</span><span class="o">=&gt;</span><span class="mi">0</span><span class="p">);</span>
-  <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-    <span class="vg">$count</span> <span class="o">=</span> <span class="n">mt_rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span><span class="c1">#在0到1000之间随机金币，逻辑自行丰富</span>
-    <span class="k">return</span> <span class="n">array</span><span class="p">(</span><span class="s1">'msg'</span><span class="o">=&gt;</span><span class="s1">'抢红包成功！'</span><span class="p">,</span><span class="s1">'count'</span><span class="o">=&gt;</span><span class="vg">$count</span><span class="p">);</span>
-  <span class="p">}</span>
-
-<span class="p">}</span></code></pre></figure>
-
-预期：乐观锁控制后，金币已经控制在100万多一点。属于正常范围内
-
-# 总结
-1. 抢红包类活动（秒杀，1元购等等）当然可以通过**`队列+延迟`**处理方式去解决，这是最完美的解决方案，但是因为业务逻辑，必须将金币实时发给用，所以可以通过悲观锁或乐观锁去解决问题。
-
-2. watch是redis中乐观锁的典型应用，它结合multi，exec等操作，可以将一系列的redis命令打包，然后发送给服务器。但是记住一系列的命令中又一个命令操作失败，redis是不会回滚的，其他命令照样可以执行成功。
-
-关于watch需要记住的：
-
-	1. 如果在事务块中所watch的key没有被当前请求修改或者被其他请求修改，exec都将返回失败；
-
-	2. 如果你watch了多个key，那么事务块中至少要有一个key被修改，否则exec也返回失败；
+   打开命令提示符，输入`ruby -v`检测是否安装Ruby成功，如果输出`ruby 2.3.0p0 (2015-12-25 revision 53290) [x64-mingw32]`表示安装成功。
 
 
+## 安装 DevKit
+
+   DevKit 是一个在 Windows 上帮助简化安装及使用 Ruby C/C++ 扩展如 RDiscount 和 RedCloth 的工具箱。 详细的安装指南可以在程序的wiki 页面 阅读。
+
+   继续前往下载地址：[download DevKit]
+
+   下载同系统及 Ruby 版本相对应的 DevKit 安装包，这里选择下载DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe。
+
+   运行安装包并解压缩至某文件夹，如 C:\DevKit。
+
+   通过初始化来创建 config.yml 文件。在命令行窗口内，输入下列命令：
+
+   ```ruby
+   cd “C:\DevKit”
+   ruby dk.rb init
+   notepad config.yml
+   ```
+
+   在打开的记事本窗口中，于末尾添加新的一行 - C:\Ruby200-x64，保存文件并退出。
+
+   ```ruby
+   # This configuration file contains the absolute path locations of all
+   # installed Rubies to be enhanced to work with the DevKit. This config
+   # file is generated by the 'ruby dk.rb init' step and may be modified
+   # before running the 'ruby dk.rb install' step. To include any installed
+   # Rubies that were not automagically discovered, simply add a line below
+   # the triple hyphens with the absolute path to the Ruby root directory.
+   #
+   # Example:
+   #
+   # ---
+   # - C:/ruby19trunk
+   # - C:/ruby192dev
+   #
+   ---
+   - C:\Ruby23-x64
+   ```
+
+   回到命令行窗口内，审查（非必须）并安装。
+
+   ```ruby
+   ruby dk.rb review
+   ruby dk.rb install
+   ```
+
+
+## 安装 Jekyll
+
+   ```ruby
+   gem -v
+   gem install jekyll
+   gem install jekyll-paginate
+   ```
+
+## 安装 Pygments
+
+   Jekyll 里默认的语法高亮插件是 Pygments。 它需要安装 Python 并在网站的配置文件_config.yml 里将 highlighter 的值设置为pygments。
+
+   安装 Python
+
+   Python下载地址：[download python]，这里下载python3.5.1
+
+   安装，添加环境变量
+
+   检验 Python 安装是否成功
+
+   ```ruby
+   python –V		
+   ```
+
+  输出：`Python 2.7.6`，表示安装成功
+
+  安装 Pygments
+  命令行执行：
+
+  ```ruby
+  easy_install Pygments
+  ```
+
+
+## 启动 Jekyll
+
+   按照官方的 Jekyll 快速开始手册 的步骤， 一个新的 Jekyll 博客可以被建立并在localhost:4000浏览。
+
+   ```ruby
+   jekyll new myblog
+   cd myblog
+   jekyll serve
+   ```
+
+
+
+
+[download Ruby]: http://rubyinstaller.org/downloads/
+[download DevKit]: http://rubyinstaller.org/downloads/
+[download python]: https://www.python.org/downloads/
 
                 <hr>
-		<p>转载请注明出处，本文地址:<a href="http://xhuiinit.github.io//2015/01/29/high-concurrency-oversold.markdown/">http://xhuiinit.github.io//2015/01/29/high-concurrency-oversold.markdown/</a></p>
+		<p>转载请注明出处，本文地址:<a href="http://xhuiinit.github.io//technology/2016/04/29/20160429153210.md/">http://xhuiinit.github.io//technology/2016/04/29/20160429153210.md/</a></p>
 
                 
                 <!-- 多说 Share start -->
                 </style>
                 <div class="ds-share"
                     style="text-align: right"
-                    data-thread-key="/2015/01/29/high-concurrency-oversold.markdown"
-                    data-title="Redis高并发产生超卖现象"
-                    data-url="http://xhuiinit.github.io//2015/01/29/high-concurrency-oversold.markdown/"
-                    data-images="http://xhuiinit.github.io//img/post-bg-2015.jpg"
-                    data-content="最近在开发一个抢红包的活动时候，由于并发导致了超卖的问题，导致发放的红包过多
+                    data-thread-key="/technology/2016/04/29/20160429153210.md"
+                    data-title="windows环境下安装jekyll开发环境"
+                    data-url="http://xhuiinit.github.io//technology/2016/04/29/20160429153210.md/"
+                    data-images="http://xhuiinit.github.io//images/home-bg.jpg"
+                    data-content="* TOC
+{:toc}
 
-# 什么是超卖
-
-首先，它不是股市那个超卖，炒股的朋友可以关闭这个页面了。... | JAVA开发、架构 " >
+Jekyll是一个静态网站生成工具。它允许用户使用HTML、Markdown或Textile来建立静态页面，然后通过模板引擎L... | JAVA开发、架构 " >
                     <div class="ds-share-inline">
                       <ul  class="ds-share-icons-16">
                         <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
@@ -297,13 +312,9 @@ redis提供了简单的事务处理机制，redis事务没有回滚功能，这�
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/2015/01/29/high-concurrency-oversold/" data-toggle="tooltip" data-placement="top" title="Redis高并发产生超卖现象">&larr; Previous Post</a>
+                        <a href="/blog/jekyll/2016/04/29/20160429153210/" data-toggle="tooltip" data-placement="top" title="windows环境下安装jekyll开发环境">&larr; Previous Post</a>
                     </li>
                     
-                    
-                    <li class="next">
-                        <a href="/technology/2016/03/04/use-jekyll-create-blog-on-github/" data-toggle="tooltip" data-placement="top" title="Jekyll本地搭建开发环境以及Github部署流程">Next Post &rarr;</a>
-                    </li>
                     
                 </ul>
 
@@ -312,9 +323,9 @@ redis提供了简单的事务处理机制，redis事务没有回滚功能，这�
                 <!-- 多说评论框 start -->
                 <div class="comment">
                     <div class="ds-thread"
-                        data-thread-key="/2015/01/29/high-concurrency-oversold.markdown"
-                        data-title="Redis高并发产生超卖现象"
-                        data-url="http://xhuiinit.github.io//2015/01/29/high-concurrency-oversold.markdown/" >
+                        data-thread-key="/technology/2016/04/29/20160429153210.md"
+                        data-title="windows环境下安装jekyll开发环境"
+                        data-url="http://xhuiinit.github.io//technology/2016/04/29/20160429153210.md/" >
                     </div>
                 </div>
                 <!-- 多说评论框 end -->
@@ -338,16 +349,20 @@ redis提供了简单的事务处理机制，redis事务没有回滚功能，这�
                     <div class="tags">
         				
                             
-        				
-                            
-                				<a href="/tags/#技术" title="技术" rel="2">
-                                    技术
+                				<a href="/tags/#redis" title="redis" rel="1">
+                                    redis
                                 </a>
                             
         				
                             
-                				<a href="/tags/#jekyll" title="jekyll" rel="2">
+                				<a href="/tags/#jekyll" title="jekyll" rel="3">
                                     jekyll
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#技术" title="技术" rel="1">
+                                    技术
                                 </a>
                             
         				
@@ -378,7 +393,7 @@ redis提供了简单的事务处理机制，redis事务没有回滚功能，这�
 <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
 <script type="text/javascript">
     // dynamic User by Hux
-    var _user = 'pizida';
+    var _user = 'xhui';
 
     // duoshuo comment query.
     var duoshuoQuery = {short_name: _user };
