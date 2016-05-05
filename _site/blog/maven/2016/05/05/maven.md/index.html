@@ -11,9 +11,9 @@
     <meta name="keyword"  content="java开发-移动开发-大数据">
     <link rel="shortcut icon" href="/images/favicon.ico">
 
-    <title>windows环境下安装jekyll开发环境 - JAVA开发、架构</title>
+    <title>intellij idea15 + maven使用 - JAVA开发、架构</title>
 
-    <link rel="canonical" href="http://xhuiinit.github.io//blog/jekyll/2016/04/29/20160429153210/">
+    <link rel="canonical" href="http://xhuiinit.github.io//blog/maven/2016/05/05/maven.md/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -134,15 +134,15 @@
                 <div class="post-heading">
                     <div class="tags">
                         
-                        <a class="tag" href="/tags/#jekyll" title="jekyll">jekyll</a>
+                        <a class="tag" href="/tags/#maven" title="maven">maven</a>
                         
                     </div>
-                    <h1>windows环境下安装jekyll开发环境</h1>
+                    <h1>intellij idea15 + maven使用</h1>
                     
                     
-                    <h2 class="subheading">jekyll开发</h2>
+                    <h2 class="subheading">maven使用</h2>
                     
-                    <span class="meta">Posted by 拉风二大爷 on April 29, 2016</span>
+                    <span class="meta">Posted by 拉风二大爷 on May 5, 2016</span>
                 </div>
             </div>
         </div>
@@ -160,139 +160,285 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-			<ul id="markdown-toc">
-  <li><a href="#ruby" id="markdown-toc-ruby">安装 Ruby</a></li>
-  <li><a href="#devkit" id="markdown-toc-devkit">安装 DevKit</a></li>
-  <li><a href="#jekyll" id="markdown-toc-jekyll">安装 Jekyll</a></li>
-  <li><a href="#pygments" id="markdown-toc-pygments">安装 Pygments</a></li>
-  <li><a href="#jekyll-1" id="markdown-toc-jekyll-1">启动 Jekyll</a></li>
-</ul>
+			* TOC
+{:toc}
 
-<p>Jekyll是一个静态网站生成工具。它允许用户使用HTML、Markdown或Textile来建立静态页面，然后通过模板引擎Liquid（Liquid Templating Engine）来运行.</p>
+Maven项目对象模型(POM)，可以通过一小段描述信息来管理项目的构建，报告和文档的软件项目管理工具。
 
-<p>网上已经有很多jekyll的安装方法，（由于本人记性太差）此处仅记录下来以免忘记了。可分为以下几个重要步骤：</p>
+## 简单使用
 
-<h2 id="ruby">安装 Ruby</h2>
+工欲善其事，必先利其器。笔者用的是64位windows系统，下载安装相应的软件：
 
-<p>Ruby下载地址：<a href="http://rubyinstaller.org/downloads/">download Ruby</a></p>
+### 安装JDK
+这里笔者用的是jdk1.7,下载地址：<a href="http://pan.baidu.com/s/1pLd6zz1">http://pan.baidu.com/s/1pLd6zz1</a>
 
-<p>在 “RubyInstallers” 部分，选择某个版本点击下载。 此处选择 Ruby 2.3.0 (x64)安装包。</p>
+### 安装maven
+下载maven，<a href="http://pan.baidu.com/s/1hsNfUCG">http://pan.baidu.com/s/1hsNfUCG</a>，解压安装
 
-<p>开始安装，这里我安装到C:\Ruby23-x64，记得安装过程中勾选<code class="highlighter-rouge">Add Ruby executables to your PATH</code>。</p>
+设置环境变量，`MAVEN_HOME`,如：D:\WORKING\apache-maven-3.2.5，设置到`PATH`中
 
-<p>打开命令提示符，输入<code class="highlighter-rouge">ruby -v</code>检测是否安装Ruby成功，如果输出<code class="highlighter-rouge">ruby 2.3.0p0 (2015-12-25 revision 53290) [x64-mingw32]</code>表示安装成功。</p>
+校验是否安装成功
 
-<h2 id="devkit">安装 DevKit</h2>
+```ruby
+C:\Users\Administrator>mvn -v
+Apache Maven 3.2.5 (12a6b3acb947671f09b81f49094c53f426d8cea1; 2014-12-15T01:29:2
+3+08:00)
+Maven home: D:\WORKING\apache-maven-3.2.5\bin\..
+Java version: 1.7.0_55, vendor: Oracle Corporation
+Java home: D:\WORKING\JAVA\jdk1.7\jre
+Default locale: zh_CN, platform encoding: GBK
+OS name: "windows 8.1", version: "6.3", arch: "amd64", family: "windows"
+```
 
-<p>DevKit 是一个在 Windows 上帮助简化安装及使用 Ruby C/C++ 扩展如 RDiscount 和 RedCloth 的工具箱。 详细的安装指南可以在程序的wiki 页面 阅读。</p>
+### 安装intellij idea
+下载intellij idea15,下载地址 <a href="http://pan.baidu.com/s/1hsNfUCG">http://pan.baidu.com/s/1dFa2wyX</a>，解压安装，注册时选择“License server”输入“http://15.idea.lanyus.com/”点击“OK”即可快速激活
 
-<p>继续前往下载地址：<a href="http://rubyinstaller.org/downloads/">download DevKit</a></p>
+### 一个简单的maven实例
+打开刚刚安装的intellij idea，新建Module，这里我们以创建一个`web`项目为例
+<img src="/images/maven/A017E6A0997FF1C210091D7CCD9030AE.png" alt="New Module"/>
+选择JDK版本，选中`maven-archetype-webapp`，点**next**；
+<img src="/images/maven/53A2F4034A083DE8D4E5622249CD823C.png" alt="New Module"/>
+填写`GroupId`和`ArtifactId`，版本默认1.0-SNAPSHOT，点击**next**；
+<img src="/images/maven/2385850B1D9FD2682DC4E9E888AC02F7.png" alt="New Module"/>
+选择`Maven home`路径，选择`settings`和`repository`，点击**next**；
+<img src="/images/maven/D71C166A06A6A544BF709B5E0D61C1EB.png" alt="New Module"/>
+点击**finsh**，这时就生成了一个`maven web`工程。
+<img src="/images/maven/393C637B36FB93912AFB6214AFCDAFA9.png" alt="New Module"/>
+然后可在该界面`clean`，`install`等
 
-<p>下载同系统及 Ruby 版本相对应的 DevKit 安装包，这里选择下载DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe。</p>
+## 管理本地仓库及远端仓库
 
-<p>运行安装包并解压缩至某文件夹，如 C:\DevKit。</p>
+### 本地仓库
+在settings中加入`<localRepository>`
+`C:\Users\Administrator\.m2\repository``</localRepository>`，既本地仓库
 
-<p>通过初始化来创建 config.yml 文件。在命令行窗口内，输入下列命令：</p>
+### 远端仓库
+在mirrors节点下加入
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">cd</span> <span class="err">“</span><span class="no">C</span><span class="p">:\</span><span class="no">DevKit</span><span class="err">”</span>
-<span class="n">ruby</span> <span class="n">dk</span><span class="p">.</span><span class="nf">rb</span> <span class="n">init</span>
-<span class="n">notepad</span> <span class="n">config</span><span class="p">.</span><span class="nf">yml</span>
-</code></pre>
-</div>
+```ruby
+<mirror>
+  <id>nexus</id>
+  <mirrorOf>central</mirrorOf>
+  <name>central Repo</name>
+  <url>http://domain:port/nexus/content/groups/public/</url>
+</mirror>
+```
+`<mirrorOf>central</mirrorOf>`表示只为central仓库做镜像
 
-<p>在打开的记事本窗口中，于末尾添加新的一行 - C:\Ruby200-x64，保存文件并退出。</p>
+如果想为所有的仓库做镜像那么可以改为`<mirrorOf>*</mirrorOf>`
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># This configuration file contains the absolute path locations of all</span>
-<span class="c1"># installed Rubies to be enhanced to work with the DevKit. This config</span>
-<span class="c1"># file is generated by the 'ruby dk.rb init' step and may be modified</span>
-<span class="c1"># before running the 'ruby dk.rb install' step. To include any installed</span>
-<span class="c1"># Rubies that were not automagically discovered, simply add a line below</span>
-<span class="c1"># the triple hyphens with the absolute path to the Ruby root directory.</span>
-<span class="c1">#</span>
-<span class="c1"># Example:</span>
-<span class="c1">#</span>
-<span class="c1"># ---</span>
-<span class="c1"># - C:/ruby19trunk</span>
-<span class="c1"># - C:/ruby192dev</span>
-<span class="c1">#</span>
-<span class="o">---</span>
-<span class="o">-</span> <span class="no">C</span><span class="p">:\</span><span class="no">Ruby23</span><span class="o">-</span><span class="n">x64</span>
-</code></pre>
-</div>
+`<url>`为具体的远端仓库地址，笔者使用的Nexus架设私服。
 
-<p>回到命令行窗口内，审查（非必须）并安装。</p>
+### 中央远端仓库
+当我们创建一个简单的Maven项目后(只需要在pom.xml配置好依赖)，
+运行mvn clean install就可以把项目构建好，不需要我们手工下载任何jar，
+这全靠中央仓库的存在，它会自动从仓库下载。
+这个仓库的定义是在`${M2_HOME}/lib/maven-2.0.10-uber.jar` 里面。
+你可以在里面找到`\org\apache\maven\project\pom-4.0.0.xml` 这个文件，
+在这个文件里面定义了默认中央仓库的地址：
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">ruby</span> <span class="n">dk</span><span class="p">.</span><span class="nf">rb</span> <span class="n">review</span>
-<span class="n">ruby</span> <span class="n">dk</span><span class="p">.</span><span class="nf">rb</span> <span class="n">install</span>
-</code></pre>
-</div>
+```ruby
+<repositories>        
+  <repository>        
+    <id> central</id>        
+    <name> Maven Repository Switchboard</name>        
+    <layout> default</layout>        
+    <url> http://repo1.maven.org/maven2</url>        
+    <snapshots>        
+      <enabled> false</enabled>        
+    </snapshots>        
+  </repository>        
+</repositories>
+```
+这里推荐一个很好的仓库，<a href=">http://mvnrepository.com/">http://mvnrepository.com/</a> ，相信地球人都知道这个。
 
-<h2 id="jekyll">安装 Jekyll</h2>
+## maven配置详解
+先来说说settings.xml，settings.xml对于maven来说相当于全局性的配置，用于所有的项目。在maven中存在两个settings.xml，
+一个位于maven的安装目录conf下面，作为全局性配置。
+对于团队设置，保持一致的定义是关键，所以maven/conf下面的settings.xml就作为团队共同的配置文件。
+保证所有的团队成员都拥有相同的配置。当然对于每个成员，都需要特殊的自定义设置，如用户信息，所以另外一个settings.xml就作为本地配置。
+默认的位置为：${user.dir}/.m2/settings.xml目录中（${user.dir} 指windows 中的用户目录）。
+settings.xml基本结构如下：
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">gem</span> <span class="o">-</span><span class="n">v</span>
-<span class="n">gem</span> <span class="n">install</span> <span class="n">jekyll</span>
-<span class="n">gem</span> <span class="n">install</span> <span class="n">jekyll</span><span class="o">-</span><span class="n">paginate</span>
-</code></pre>
-</div>
+```ruby
+<settings xmlns="http://maven.apache.org/POM/4.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <localRepository/>
+  <interactiveMode/>
+  <usePluginRegistry/>
+  <offline/>
+  <pluginGroups/>
+  <servers/>
+  <mirrors/>
+  <proxies/>
+  <profiles/>
+  <activeProfiles/>
+</settings>
+```
+简单介绍一下几个主要的配置因素：
 
-<h2 id="pygments">安装 Pygments</h2>
+* localRepository：表示本地库的保存位置，也就是maven2主要的jar保存位置，默认在${user.dir}/.m2/repository，如果需要另外设置，就换成其他的路径。
 
-<p>Jekyll 里默认的语法高亮插件是 Pygments。 它需要安装 Python 并在网站的配置文件_config.yml 里将 highlighter 的值设置为pygments。</p>
+* offline：如果不想每次编译，都去查找远程中心库，那就设置为true。当然前提是你已经下载了必须的依赖包。
 
-<p>安装 Python</p>
+* servers：在POM中的 distributionManagement元素定义了开发库。然而，特定的username和pwd不能使用于pom.xml，所以通过此配置来保存server信息
 
-<p>Python下载地址：<a href="https://www.python.org/downloads/">download python</a>，这里下载python3.5.1</p>
+* Mirrors：表示镜像库，指定库的镜像，用于增加其他库
 
-<p>安装，添加环境变量</p>
+* proxies：此设置，主要用于无法直接访问中心的库用户配置
 
-<p>检验 Python 安装是否成功</p>
+* profiles：类似于pom.xml中的profile元素，主要包括activation,repositories,pluginRepositories 和properties元素 
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">python</span> <span class="err">–</span><span class="no">V</span>		
-</code></pre>
-</div>
+* repositories 和pluginRepositories：定义其他开发库和插件开发库。对于团队来说，肯定有自己的开发库。可以通过此配置来定义
 
-<p>输出：<code class="highlighter-rouge">Python 2.7.6</code>，表示安装成功</p>
+* properties：maven 的properties作为placeholder值，如ant的properties。包括以下的5种类型值：
+  + env，返回当前的环境变量
+  + project.x，返回pom中定义的元素值，如project.version
+  + settings.x，返回settings.xml中定义的元素
+  + java系统属性，所有经过java.lang.System.getProperties()返回的值
+  + x，用户自己设定的值
+* activation：用于激活此profile
+  + jdk:如果匹配指定的jdk版本，将会激活
+  + os:操作系统
+  + property：如果maven能检测到相应的属性
+  + file: 用于判断文件是否存在或者不存在
 
-<p>安装 Pygments
-命令行执行：</p>
+* active profiles：除了使用activation来激活profile，同样可以通过activeProfiles来激活
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">easy_install</span> <span class="no">Pygments</span>
-</code></pre>
-</div>
+## maven多模块管理
+可以使用Maven来管理多个项目，首先是添加一个父pom.xml 文件，其中父pom.xml 的packaging 必须为 pom 类型。
+此时可以把需管理的项目的共用的dependencies ,plugin 移动到这个父pom.xml ，然后使用modules 添加到父pom.xml 中。
 
-<h2 id="jekyll-1">启动 Jekyll</h2>
+```ruby
+<modules>
+  <module>childProject</module>
+</modules>
+```
+修改子项目的pom.xml ，添加一个parent 元素
 
-<p>按照官方的 Jekyll 快速开始手册 的步骤， 一个新的 Jekyll 博客可以被建立并在localhost:4000浏览。</p>
+```ruby
+<parent>
+    <artifactId>parentProject</artifactId>
+    <groupId>com.test</groupId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>../</relativePath>
+</parent>
+```
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">jekyll</span> <span class="kp">new</span> <span class="n">myblog</span>
-<span class="n">cd</span> <span class="n">myblog</span>
-<span class="n">jekyll</span> <span class="n">serve</span>
-</code></pre>
-</div>
+## maven deploy
+玩过 maven 私服的都知道这个玩意，在本地的 pom 文件里做好配置，执行下 maven 的 deploy 即可把新的 jar/war等 部署到私服上，pom中添加以下配置
 
+```ruby
+<distributionManagement>
+  <repository>
+    <id>releases</id>
+    <name>Nexus Release Repository</name>
+    <url>http://domain:port/xxx/releases/</url>
+  </repository>
+  <snapshotRepository>
+    <id>snapshots</id>
+    <name>Nexus Snapshot Repository</name>
+    <url> http://domain:port/xxx/snapshots/</url>
+  </snapshotRepository>
+</distributionManagement>
+```
+然后maven/conf下的settings中的servers节点加入如下配置：
 
+```ruby
+<server>
+  <id>releases</id>
+  <username>username</username>
+  <password>password</password>
+</server>
+<server>
+  <id>snapshots</id>
+  <username> username </username>
+  <password> password </password>
+</server>
+```
+
+## maven常用命令
+下面列举一些maven的常用命令，至于具体情况可谷歌或者度娘
+
+```ruby
+mvn archetype：create 创建Maven项目
+mvn compile 编译源代码
+mvn deploy 发布项目
+mvn test-compile 编译测试源代码
+mvn test 运行应用程序中的单元测试
+mvn site 生成项目相关信息的网站
+mvn clean 清除项目目录中的生成结果
+mvn package 根据项目生成的jar
+mvn install 在本地Repository中安装jar
+mvn eclipse:eclipse 生成eclipse项目文件
+mvnjetty:run 启动jetty服务
+mvntomcat:run 启动tomcat服务
+mvn clean package -Dmaven.test.skip=true:清除以前的包后重新打包，跳过测试
+```
+
+## maven生命周期
+Maven的生命周期是为了对所有的构建过程进行了抽象了，便于统一。
+
+```ruby
+clean(清理)
+此生命周期旨在给工程做清理工作，它主要包含以下阶段：
+pre-clean - 执行项目清理前所需要的工作。
+clean - 清理上一次build项目生成的文件。
+post-clean - 执行完成项目清理所需的工作.
+default(默认)
+validate - 验证项目是否正确且所有必要的信息都可用。
+initialize - 初始化构建工作，如：设置参数，创建目录等。
+generate-sources - 为包含在编译范围内的代码生成源代码.
+process-sources - 处理源代码, 如过滤值.
+generate-resources -
+process-resources - 复制并处理资源文件，至目标目录，准备打包。
+compile - 编译项目中的源代码.
+process-classes - 为编译生成的文件做后期工作, 例如做Java类的字节码增强.
+generate-test-sources - 为编译内容生成测试源代码.
+process-test-sources - 处理测试源代码。
+generate-test-resources -
+process-test-resources - 复制并处理资源文件，至目标测试目录。
+test-compile - 将需测试源代码编译到路径。一般来说，
+是编译/src/test/java目录下的java文件至目标输出的测试classpath目录中。
+process-test-classes -
+test - 使用合适的单元测试框架运行测试。这些测试代码不会被打包或部署。
+prepare-package -
+package - 接受编译好的代码，打包成可发布的格式，如 JAR 。
+pre-integration-test -
+integration-test - 按需求将发布包部署到运行环境。
+post-integration-test -
+verify -
+install -将包安装到本地仓库，给其他本地引用提供依赖。
+deploy -完成集成和发布工作，将最终包复制到远程仓库以便分享给其他开发人员。
+site(站点)
+pre-site - 执行一些生成项目站点前的准备工作。
+site - 生成项目站点的文档。
+post-site - 执行需完成站点生成的工作，如站点部署的准备工作。
+site-deploy - 向制定的web服务器部署站点生成文件。
+```
 
                 <hr>
-		<p>转载请注明出处，本文地址:<a href="http://xhuiinit.github.io//blog/jekyll/2016/04/29/20160429153210/">http://xhuiinit.github.io//blog/jekyll/2016/04/29/20160429153210/</a></p>
+		<p>转载请注明出处，本文地址:<a href="http://xhuiinit.github.io//blog/maven/2016/05/05/maven.md/">http://xhuiinit.github.io//blog/maven/2016/05/05/maven.md/</a></p>
 
                 
                 <!-- 多说 Share start -->
                 </style>
                 <div class="ds-share"
                     style="text-align: right"
-                    data-thread-key="/blog/jekyll/2016/04/29/20160429153210"
-                    data-title="windows环境下安装jekyll开发环境"
-                    data-url="http://xhuiinit.github.io//blog/jekyll/2016/04/29/20160429153210/"
+                    data-thread-key="/blog/maven/2016/05/05/maven.md"
+                    data-title="intellij idea15 + maven使用"
+                    data-url="http://xhuiinit.github.io//blog/maven/2016/05/05/maven.md/"
                     data-images="http://xhuiinit.github.io//images/home-bg.jpg"
-                    data-content="
-  安装 Ruby
-  安装 DevKit
-  安装 Jekyll
-  安装 Pygments
-  启动 Jekyll
+                    data-content="* TOC
+{:toc}
 
+Maven项目对象模型(POM)，可以通过一小段描述信息来管理项目的构建，报告和文档的软件项目管理工具。
 
-Jekyll是一个静态网站生... | JAVA开发、架构 " >
+## 简单使用
+
+... | JAVA开发、架构 " >
                     <div class="ds-share-inline">
                       <ul  class="ds-share-icons-16">
                         <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
@@ -312,13 +458,9 @@ Jekyll是一个静态网站生... | JAVA开发、架构 " >
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/technology/2016/03/15/how-to-solve-cross-origin/" data-toggle="tooltip" data-placement="top" title="Access-Control-Allow-Origin跨域现象分析及解决方案">&larr; Previous Post</a>
+                        <a href="/blog/maven/2016/05/05/maven/" data-toggle="tooltip" data-placement="top" title="intellij idea15 + maven使用">&larr; Previous Post</a>
                     </li>
                     
-                    
-                    <li class="next">
-                        <a href="/blog/maven/2016/05/05/maven/" data-toggle="tooltip" data-placement="top" title="intellij idea15 + maven使用">Next Post &rarr;</a>
-                    </li>
                     
                 </ul>
 
@@ -327,9 +469,9 @@ Jekyll是一个静态网站生... | JAVA开发、架构 " >
                 <!-- 多说评论框 start -->
                 <div class="comment">
                     <div class="ds-thread"
-                        data-thread-key="/blog/jekyll/2016/04/29/20160429153210"
-                        data-title="windows环境下安装jekyll开发环境"
-                        data-url="http://xhuiinit.github.io//blog/jekyll/2016/04/29/20160429153210/" >
+                        data-thread-key="/blog/maven/2016/05/05/maven.md"
+                        data-title="intellij idea15 + maven使用"
+                        data-url="http://xhuiinit.github.io//blog/maven/2016/05/05/maven.md/" >
                     </div>
                 </div>
                 <!-- 多说评论框 end -->

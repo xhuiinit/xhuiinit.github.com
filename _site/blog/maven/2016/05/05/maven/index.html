@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+    <meta name="description" content="">
+    <meta name="keyword"  content="java开发-移动开发-大数据">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+
+    <title>intellij idea15 + maven使用 - JAVA开发、架构</title>
+
+    <link rel="canonical" href="http://xhuiinit.github.io//blog/maven/2016/05/05/maven/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">拉风二大爷</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about/">ABOUT</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/images/home-bg.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/images/home-bg.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#maven" title="maven">maven</a>
+                        
+                    </div>
+                    <h1>intellij idea15 + maven使用</h1>
+                    
+                    
+                    <h2 class="subheading">maven使用</h2>
+                    
+                    <span class="meta">Posted by 拉风二大爷 on May 5, 2016</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+			<ul id="markdown-toc">
+  <li><a href="#section" id="markdown-toc-section">简单使用</a>    <ul>
+      <li><a href="#jdk" id="markdown-toc-jdk">安装JDK</a></li>
+      <li><a href="#maven" id="markdown-toc-maven">安装maven</a></li>
+      <li><a href="#intellij-idea" id="markdown-toc-intellij-idea">安装intellij idea</a></li>
+      <li><a href="#maven-1" id="markdown-toc-maven-1">一个简单的maven实例</a></li>
+    </ul>
+  </li>
+  <li><a href="#section-1" id="markdown-toc-section-1">管理本地仓库及远端仓库</a>    <ul>
+      <li><a href="#section-2" id="markdown-toc-section-2">本地仓库</a></li>
+      <li><a href="#section-3" id="markdown-toc-section-3">远端仓库</a></li>
+      <li><a href="#section-4" id="markdown-toc-section-4">中央远端仓库</a></li>
+    </ul>
+  </li>
+  <li><a href="#maven-2" id="markdown-toc-maven-2">maven配置详解</a></li>
+  <li><a href="#maven-3" id="markdown-toc-maven-3">maven多模块管理</a></li>
+  <li><a href="#maven-deploy" id="markdown-toc-maven-deploy">maven deploy</a></li>
+  <li><a href="#maven-4" id="markdown-toc-maven-4">maven常用命令</a></li>
+  <li><a href="#maven-5" id="markdown-toc-maven-5">maven生命周期</a></li>
+</ul>
+
+<p>Maven项目对象模型(POM)，可以通过一小段描述信息来管理项目的构建，报告和文档的软件项目管理工具。</p>
+
+<h2 id="section">简单使用</h2>
+
+<p>工欲善其事，必先利其器。笔者用的是64位windows系统，下载安装相应的软件：</p>
+
+<h3 id="jdk">安装JDK</h3>
+<p>这里笔者用的是jdk1.7,下载地址：<a href="http://pan.baidu.com/s/1pLd6zz1">http://pan.baidu.com/s/1pLd6zz1</a></p>
+
+<h3 id="maven">安装maven</h3>
+<p>下载maven，<a href="http://pan.baidu.com/s/1hsNfUCG">http://pan.baidu.com/s/1hsNfUCG</a>，解压安装</p>
+
+<p>设置环境变量，<code class="highlighter-rouge">MAVEN_HOME</code>,如：D:\WORKING\apache-maven-3.2.5，设置到<code class="highlighter-rouge">PATH</code>中</p>
+
+<p>校验是否安装成功</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">C</span><span class="p">:\</span><span class="no">Users</span><span class="p">\</span><span class="no">Administrator</span><span class="o">&gt;</span><span class="n">mvn</span> <span class="o">-</span><span class="n">v</span>
+<span class="no">Apache</span> <span class="no">Maven</span> <span class="mi">3</span><span class="o">.</span><span class="mi">2</span><span class="o">.</span><span class="mi">5</span> <span class="p">(</span><span class="mi">12</span><span class="n">a6b3acb947671f09b81f49094c53f426d8cea1</span><span class="p">;</span> <span class="mi">2014</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">15</span><span class="no">T01</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">2</span>
+<span class="mi">3</span><span class="o">+</span><span class="mi">08</span><span class="p">:</span><span class="mo">00</span><span class="p">)</span>
+<span class="no">Maven</span> <span class="ss">home: </span><span class="no">D</span><span class="p">:\</span><span class="no">WORKING</span><span class="p">\</span><span class="n">apache</span><span class="o">-</span><span class="n">maven</span><span class="o">-</span><span class="mi">3</span><span class="o">.</span><span class="mi">2</span><span class="o">.</span><span class="mi">5</span><span class="p">\</span><span class="n">bin</span><span class="p">\.</span><span class="nf">.</span>
+<span class="no">Java</span> <span class="ss">version: </span><span class="mi">1</span><span class="o">.</span><span class="mi">7</span><span class="o">.</span><span class="mo">0_55</span><span class="p">,</span> <span class="ss">vendor: </span><span class="no">Oracle</span> <span class="no">Corporation</span>
+<span class="no">Java</span> <span class="ss">home: </span><span class="no">D</span><span class="p">:\</span><span class="no">WORKING</span><span class="p">\</span><span class="no">JAVA</span><span class="p">\</span><span class="n">jdk1</span><span class="o">.</span><span class="mi">7</span><span class="p">\</span><span class="n">jre</span>
+<span class="no">Default</span> <span class="ss">locale: </span><span class="n">zh_CN</span><span class="p">,</span> <span class="n">platform</span> <span class="ss">encoding: </span><span class="no">GBK</span>
+<span class="no">OS</span> <span class="ss">name: </span><span class="s2">"windows 8.1"</span><span class="p">,</span> <span class="ss">version: </span><span class="s2">"6.3"</span><span class="p">,</span> <span class="ss">arch: </span><span class="s2">"amd64"</span><span class="p">,</span> <span class="ss">family: </span><span class="s2">"windows"</span>
+</code></pre>
+</div>
+
+<h3 id="intellij-idea">安装intellij idea</h3>
+<p>下载intellij idea15,下载地址 <a href="http://pan.baidu.com/s/1hsNfUCG">http://pan.baidu.com/s/1dFa2wyX</a>，解压安装，注册时选择“License server”输入“http://15.idea.lanyus.com/”点击“OK”即可快速激活</p>
+
+<h3 id="maven-1">一个简单的maven实例</h3>
+<p>打开刚刚安装的intellij idea，新建Module，这里我们以创建一个<code class="highlighter-rouge">web</code>项目为例
+<img src="/images/maven/A017E6A0997FF1C210091D7CCD9030AE.png" alt="New Module" />
+选择JDK版本，选中<code class="highlighter-rouge">maven-archetype-webapp</code>，点<strong>next</strong>；
+<img src="/images/maven/53A2F4034A083DE8D4E5622249CD823C.png" alt="New Module" />
+填写<code class="highlighter-rouge">GroupId</code>和<code class="highlighter-rouge">ArtifactId</code>，版本默认1.0-SNAPSHOT，点击<strong>next</strong>；
+<img src="/images/maven/2385850B1D9FD2682DC4E9E888AC02F7.png" alt="New Module" />
+选择<code class="highlighter-rouge">Maven home</code>路径，选择<code class="highlighter-rouge">settings</code>和<code class="highlighter-rouge">repository</code>，点击<strong>next</strong>；
+<img src="/images/maven/D71C166A06A6A544BF709B5E0D61C1EB.png" alt="New Module" />
+点击<strong>finsh</strong>，这时就生成了一个<code class="highlighter-rouge">maven web</code>工程。
+<img src="/images/maven/393C637B36FB93912AFB6214AFCDAFA9.png" alt="New Module" />
+然后可在该界面<code class="highlighter-rouge">clean</code>，<code class="highlighter-rouge">install</code>等</p>
+
+<h2 id="section-1">管理本地仓库及远端仓库</h2>
+
+<h3 id="section-2">本地仓库</h3>
+<p>在settings中加入<code class="highlighter-rouge">&lt;localRepository&gt;</code>
+<code class="highlighter-rouge">C:\Users\Administrator\.m2\repository</code>
+<code class="highlighter-rouge">&lt;/localRepository&gt;</code>，既本地仓库</p>
+
+<h3 id="section-3">远端仓库</h3>
+<p>在mirrors节点下加入</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&lt;</span><span class="n">mirror</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="nb">id</span><span class="o">&gt;</span><span class="n">nexus</span><span class="o">&lt;</span><span class="sr">/id&gt;
+  &lt;mirrorOf&gt;central&lt;/mi</span><span class="n">rrorOf</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="nb">name</span><span class="o">&gt;</span><span class="n">central</span> <span class="no">Repo</span><span class="o">&lt;</span><span class="sr">/name&gt;
+  &lt;url&gt;http:/</span><span class="o">/</span><span class="n">domain</span><span class="ss">:port</span><span class="o">/</span><span class="n">nexus</span><span class="o">/</span><span class="n">content</span><span class="o">/</span><span class="n">groups</span><span class="o">/</span><span class="kp">public</span><span class="sr">/&lt;/u</span><span class="n">rl</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="sr">/mirror&gt;
+</span></code></pre>
+</div>
+<p><code class="highlighter-rouge">&lt;mirrorOf&gt;central&lt;/mirrorOf&gt;</code>表示只为central仓库做镜像</p>
+
+<p>如果想为所有的仓库做镜像那么可以改为<code class="highlighter-rouge">&lt;mirrorOf&gt;*&lt;/mirrorOf&gt;</code></p>
+
+<p><code class="highlighter-rouge">&lt;url&gt;</code>为具体的远端仓库地址，笔者使用的Nexus架设私服。</p>
+
+<h3 id="section-4">中央远端仓库</h3>
+<p>当我们创建一个简单的Maven项目后(只需要在pom.xml配置好依赖)，
+运行mvn clean install就可以把项目构建好，不需要我们手工下载任何jar，
+这全靠中央仓库的存在，它会自动从仓库下载。
+这个仓库的定义是在<code class="highlighter-rouge">${M2_HOME}/lib/maven-2.0.10-uber.jar</code> 里面。
+你可以在里面找到<code class="highlighter-rouge">\org\apache\maven\project\pom-4.0.0.xml</code> 这个文件，
+在这个文件里面定义了默认中央仓库的地址：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&lt;</span><span class="n">repositories</span><span class="o">&gt;</span>        
+  <span class="o">&lt;</span><span class="n">repository</span><span class="o">&gt;</span>        
+    <span class="o">&lt;</span><span class="nb">id</span><span class="o">&gt;</span> <span class="n">central</span><span class="o">&lt;</span><span class="sr">/id&gt;        
+    &lt;name&gt; Maven Repository Switchboard&lt;/n</span><span class="n">ame</span><span class="o">&gt;</span>        
+    <span class="o">&lt;</span><span class="n">layout</span><span class="o">&gt;</span> <span class="n">default</span><span class="o">&lt;</span><span class="sr">/layout&gt;        
+    &lt;url&gt; http:/</span><span class="o">/</span><span class="n">repo1</span><span class="p">.</span><span class="nf">maven</span><span class="p">.</span><span class="nf">org</span><span class="o">/</span><span class="n">maven2</span><span class="o">&lt;</span><span class="sr">/url&gt;        
+    &lt;snapshots&gt;        
+      &lt;enabled&gt; false&lt;/en</span><span class="n">abled</span><span class="o">&gt;</span>        
+    <span class="o">&lt;</span><span class="sr">/snapshots&gt;        
+  &lt;/</span><span class="n">repository</span><span class="o">&gt;</span>        
+<span class="o">&lt;</span><span class="sr">/repositories&gt;
+</span></code></pre>
+</div>
+<p>这里推荐一个很好的仓库，<a href="&gt;http://mvnrepository.com/">http://mvnrepository.com/</a> ，相信地球人都知道这个。</p>
+
+<h2 id="maven-2">maven配置详解</h2>
+<p>先来说说settings.xml，settings.xml对于maven来说相当于全局性的配置，用于所有的项目。在maven中存在两个settings.xml，
+一个位于maven的安装目录conf下面，作为全局性配置。
+对于团队设置，保持一致的定义是关键，所以maven/conf下面的settings.xml就作为团队共同的配置文件。
+保证所有的团队成员都拥有相同的配置。当然对于每个成员，都需要特殊的自定义设置，如用户信息，所以另外一个settings.xml就作为本地配置。
+默认的位置为：${user.dir}/.m2/settings.xml目录中（${user.dir} 指windows 中的用户目录）。
+settings.xml基本结构如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&lt;</span><span class="n">settings</span> <span class="n">xmlns</span><span class="o">=</span><span class="s2">"http://maven.apache.org/POM/4.0.0"</span>
+          <span class="n">xmlns</span><span class="ss">:xsi</span><span class="o">=</span><span class="s2">"http://www.w3.org/2001/XMLSchema-instance"</span>
+          <span class="n">xsi</span><span class="ss">:schemaLocation</span><span class="o">=</span><span class="s2">"http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/xsd/settings-1.0.0.xsd"</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">localRepository</span><span class="o">/&gt;</span>
+  <span class="o">&lt;</span><span class="n">interactiveMode</span><span class="o">/&gt;</span>
+  <span class="o">&lt;</span><span class="n">usePluginRegistry</span><span class="o">/&gt;</span>
+  <span class="o">&lt;</span><span class="n">offline</span><span class="o">/&gt;</span>
+  <span class="o">&lt;</span><span class="n">pluginGroups</span><span class="o">/&gt;</span>
+  <span class="o">&lt;</span><span class="n">servers</span><span class="o">/&gt;</span>
+  <span class="o">&lt;</span><span class="n">mirrors</span><span class="o">/&gt;</span>
+  <span class="o">&lt;</span><span class="n">proxies</span><span class="o">/&gt;</span>
+  <span class="o">&lt;</span><span class="n">profiles</span><span class="o">/&gt;</span>
+  <span class="o">&lt;</span><span class="n">activeProfiles</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="sr">/settings&gt;
+</span></code></pre>
+</div>
+<p>简单介绍一下几个主要的配置因素：</p>
+
+<ul>
+  <li>
+    <p>localRepository：表示本地库的保存位置，也就是maven2主要的jar保存位置，默认在${user.dir}/.m2/repository，如果需要另外设置，就换成其他的路径。</p>
+  </li>
+  <li>
+    <p>offline：如果不想每次编译，都去查找远程中心库，那就设置为true。当然前提是你已经下载了必须的依赖包。</p>
+  </li>
+  <li>
+    <p>servers：在POM中的 distributionManagement元素定义了开发库。然而，特定的username和pwd不能使用于pom.xml，所以通过此配置来保存server信息</p>
+  </li>
+  <li>
+    <p>Mirrors：表示镜像库，指定库的镜像，用于增加其他库</p>
+  </li>
+  <li>
+    <p>proxies：此设置，主要用于无法直接访问中心的库用户配置</p>
+  </li>
+  <li>
+    <p>profiles：类似于pom.xml中的profile元素，主要包括activation,repositories,pluginRepositories 和properties元素</p>
+  </li>
+  <li>
+    <p>repositories 和pluginRepositories：定义其他开发库和插件开发库。对于团队来说，肯定有自己的开发库。可以通过此配置来定义</p>
+  </li>
+  <li>properties：maven 的properties作为placeholder值，如ant的properties。包括以下的5种类型值：
+    <ul>
+      <li>env，返回当前的环境变量</li>
+      <li>project.x，返回pom中定义的元素值，如project.version</li>
+      <li>settings.x，返回settings.xml中定义的元素</li>
+      <li>java系统属性，所有经过java.lang.System.getProperties()返回的值</li>
+      <li>x，用户自己设定的值</li>
+    </ul>
+  </li>
+  <li>activation：用于激活此profile
+    <ul>
+      <li>jdk:如果匹配指定的jdk版本，将会激活</li>
+      <li>os:操作系统</li>
+      <li>property：如果maven能检测到相应的属性</li>
+      <li>file: 用于判断文件是否存在或者不存在</li>
+    </ul>
+  </li>
+  <li>active profiles：除了使用activation来激活profile，同样可以通过activeProfiles来激活</li>
+</ul>
+
+<h2 id="maven-3">maven多模块管理</h2>
+<p>可以使用Maven来管理多个项目，首先是添加一个父pom.xml 文件，其中父pom.xml 的packaging 必须为 pom 类型。
+此时可以把需管理的项目的共用的dependencies ,plugin 移动到这个父pom.xml ，然后使用modules 添加到父pom.xml 中。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&lt;</span><span class="n">modules</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span><span class="n">childProject</span><span class="o">&lt;</span><span class="sr">/module&gt;
+&lt;/mo</span><span class="n">dules</span><span class="o">&gt;</span>
+</code></pre>
+</div>
+<p>修改子项目的pom.xml ，添加一个parent 元素</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&lt;</span><span class="n">parent</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">artifactId</span><span class="o">&gt;</span><span class="n">parentProject</span><span class="o">&lt;</span><span class="sr">/artifactId&gt;
+    &lt;groupId&gt;com.test&lt;/</span><span class="n">groupId</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="mi">1</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="no">SNAPSHOT</span><span class="o">&lt;</span><span class="sr">/version&gt;
+    &lt;relativePath&gt;../</span><span class="o">&lt;</span><span class="sr">/relativePath&gt;
+&lt;/</span><span class="n">parent</span><span class="o">&gt;</span>
+</code></pre>
+</div>
+
+<h2 id="maven-deploy">maven deploy</h2>
+<p>玩过 maven 私服的都知道这个玩意，在本地的 pom 文件里做好配置，执行下 maven 的 deploy 即可把新的 jar/war等 部署到私服上，pom中添加以下配置</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&lt;</span><span class="n">distributionManagement</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">repository</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="nb">id</span><span class="o">&gt;</span><span class="n">releases</span><span class="o">&lt;</span><span class="sr">/id&gt;
+    &lt;name&gt;Nexus Release Repository&lt;/n</span><span class="n">ame</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">url</span><span class="o">&gt;</span><span class="n">http</span><span class="ss">:/</span><span class="o">/</span><span class="n">domain</span><span class="ss">:port</span><span class="o">/</span><span class="n">xxx</span><span class="o">/</span><span class="n">releases</span><span class="o">/&lt;</span><span class="sr">/url&gt;
+  &lt;/</span><span class="n">repository</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">snapshotRepository</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="nb">id</span><span class="o">&gt;</span><span class="n">snapshots</span><span class="o">&lt;</span><span class="sr">/id&gt;
+    &lt;name&gt;Nexus Snapshot Repository&lt;/n</span><span class="n">ame</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">url</span><span class="o">&gt;</span> <span class="n">http</span><span class="ss">:/</span><span class="o">/</span><span class="n">domain</span><span class="ss">:port</span><span class="o">/</span><span class="n">xxx</span><span class="o">/</span><span class="n">snapshots</span><span class="o">/&lt;</span><span class="sr">/url&gt;
+  &lt;/sn</span><span class="n">apshotRepository</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="sr">/distributionManagement&gt;
+</span></code></pre>
+</div>
+<p>然后maven/conf下的settings中的servers节点加入如下配置：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&lt;</span><span class="n">server</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="nb">id</span><span class="o">&gt;</span><span class="n">releases</span><span class="o">&lt;</span><span class="sr">/id&gt;
+  &lt;username&gt;username&lt;/use</span><span class="n">rname</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">password</span><span class="o">&gt;</span><span class="n">password</span><span class="o">&lt;</span><span class="sr">/password&gt;
+&lt;/se</span><span class="n">rver</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">server</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="nb">id</span><span class="o">&gt;</span><span class="n">snapshots</span><span class="o">&lt;</span><span class="sr">/id&gt;
+  &lt;username&gt; username &lt;/use</span><span class="n">rname</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">password</span><span class="o">&gt;</span> <span class="n">password</span> <span class="o">&lt;</span><span class="sr">/password&gt;
+&lt;/se</span><span class="n">rver</span><span class="o">&gt;</span>
+</code></pre>
+</div>
+
+<h2 id="maven-4">maven常用命令</h2>
+<p>下面列举一些maven的常用命令，至于具体情况可谷歌或者度娘</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">mvn</span> <span class="n">archetype</span><span class="err">：</span><span class="n">create</span> <span class="err">创建</span><span class="no">Maven</span><span class="err">项目</span>
+<span class="n">mvn</span> <span class="n">compile</span> <span class="err">编译源代码</span>
+<span class="n">mvn</span> <span class="n">deploy</span> <span class="err">发布项目</span>
+<span class="n">mvn</span> <span class="nb">test</span><span class="o">-</span><span class="n">compile</span> <span class="err">编译测试源代码</span>
+<span class="n">mvn</span> <span class="nb">test</span> <span class="err">运行应用程序中的单元测试</span>
+<span class="n">mvn</span> <span class="n">site</span> <span class="err">生成项目相关信息的网站</span>
+<span class="n">mvn</span> <span class="n">clean</span> <span class="err">清除项目目录中的生成结果</span>
+<span class="n">mvn</span> <span class="n">package</span> <span class="err">根据项目生成的</span><span class="n">jar</span>
+<span class="n">mvn</span> <span class="n">install</span> <span class="err">在本地</span><span class="no">Repository</span><span class="err">中安装</span><span class="n">jar</span>
+<span class="n">mvn</span> <span class="n">eclipse</span><span class="ss">:eclipse</span> <span class="err">生成</span><span class="n">eclipse</span><span class="err">项目文件</span>
+<span class="n">mvnjetty</span><span class="ss">:run</span> <span class="err">启动</span><span class="n">jetty</span><span class="err">服务</span>
+<span class="n">mvntomcat</span><span class="ss">:run</span> <span class="err">启动</span><span class="n">tomcat</span><span class="err">服务</span>
+<span class="n">mvn</span> <span class="n">clean</span> <span class="n">package</span> <span class="o">-</span><span class="no">Dmaven</span><span class="p">.</span><span class="nf">test</span><span class="p">.</span><span class="nf">skip</span><span class="o">=</span><span class="kp">true</span><span class="p">:</span><span class="err">清除以前的包后重新打包，跳过测试</span>
+</code></pre>
+</div>
+
+<h2 id="maven-5">maven生命周期</h2>
+<p>Maven的生命周期是为了对所有的构建过程进行了抽象了，便于统一。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">clean</span><span class="p">(</span><span class="err">清理</span><span class="p">)</span>
+<span class="err">此生命周期旨在给工程做清理工作，它主要包含以下阶段：</span>
+<span class="n">pre</span><span class="o">-</span><span class="n">clean</span> <span class="o">-</span> <span class="err">执行项目清理前所需要的工作。</span>
+<span class="n">clean</span> <span class="o">-</span> <span class="err">清理上一次</span><span class="n">build</span><span class="err">项目生成的文件。</span>
+<span class="n">post</span><span class="o">-</span><span class="n">clean</span> <span class="o">-</span> <span class="err">执行完成项目清理所需的工作</span><span class="p">.</span>
+<span class="nf">default</span><span class="p">(</span><span class="err">默认</span><span class="p">)</span>
+<span class="n">validate</span> <span class="o">-</span> <span class="err">验证项目是否正确且所有必要的信息都可用。</span>
+<span class="kp">initialize</span> <span class="o">-</span> <span class="err">初始化构建工作，如：设置参数，创建目录等。</span>
+<span class="n">generate</span><span class="o">-</span><span class="n">sources</span> <span class="o">-</span> <span class="err">为包含在编译范围内的代码生成源代码</span><span class="p">.</span>
+<span class="nf">process</span><span class="o">-</span><span class="n">sources</span> <span class="o">-</span> <span class="err">处理源代码</span><span class="p">,</span> <span class="err">如过滤值</span><span class="p">.</span>
+<span class="nf">generate</span><span class="o">-</span><span class="n">resources</span> <span class="o">-</span>
+<span class="n">process</span><span class="o">-</span><span class="n">resources</span> <span class="o">-</span> <span class="err">复制并处理资源文件，至目标目录，准备打包。</span>
+<span class="n">compile</span> <span class="o">-</span> <span class="err">编译项目中的源代码</span><span class="p">.</span>
+<span class="nf">process</span><span class="o">-</span><span class="n">classes</span> <span class="o">-</span> <span class="err">为编译生成的文件做后期工作</span><span class="p">,</span> <span class="err">例如做</span><span class="no">Java</span><span class="err">类的字节码增强</span><span class="p">.</span>
+<span class="nf">generate</span><span class="o">-</span><span class="nb">test</span><span class="o">-</span><span class="n">sources</span> <span class="o">-</span> <span class="err">为编译内容生成测试源代码</span><span class="p">.</span>
+<span class="nf">process</span><span class="o">-</span><span class="nb">test</span><span class="o">-</span><span class="n">sources</span> <span class="o">-</span> <span class="err">处理测试源代码。</span>
+<span class="n">generate</span><span class="o">-</span><span class="nb">test</span><span class="o">-</span><span class="n">resources</span> <span class="o">-</span>
+<span class="n">process</span><span class="o">-</span><span class="nb">test</span><span class="o">-</span><span class="n">resources</span> <span class="o">-</span> <span class="err">复制并处理资源文件，至目标测试目录。</span>
+<span class="nb">test</span><span class="o">-</span><span class="n">compile</span> <span class="o">-</span> <span class="err">将需测试源代码编译到路径。一般来说，</span>
+<span class="err">是编译</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="nb">test</span><span class="o">/</span><span class="n">java</span><span class="err">目录下的</span><span class="n">java</span><span class="err">文件至目标输出的测试</span><span class="n">classpath</span><span class="err">目录中。</span>
+<span class="n">process</span><span class="o">-</span><span class="nb">test</span><span class="o">-</span><span class="n">classes</span> <span class="o">-</span>
+<span class="nb">test</span> <span class="o">-</span> <span class="err">使用合适的单元测试框架运行测试。这些测试代码不会被打包或部署。</span>
+<span class="n">prepare</span><span class="o">-</span><span class="n">package</span> <span class="o">-</span>
+<span class="n">package</span> <span class="o">-</span> <span class="err">接受编译好的代码，打包成可发布的格式，如</span> <span class="no">JAR</span> <span class="err">。</span>
+<span class="n">pre</span><span class="o">-</span><span class="n">integration</span><span class="o">-</span><span class="nb">test</span> <span class="o">-</span>
+<span class="n">integration</span><span class="o">-</span><span class="nb">test</span> <span class="o">-</span> <span class="err">按需求将发布包部署到运行环境。</span>
+<span class="n">post</span><span class="o">-</span><span class="n">integration</span><span class="o">-</span><span class="nb">test</span> <span class="o">-</span>
+<span class="n">verify</span> <span class="o">-</span>
+<span class="n">install</span> <span class="o">-</span><span class="err">将包安装到本地仓库，给其他本地引用提供依赖。</span>
+<span class="n">deploy</span> <span class="o">-</span><span class="err">完成集成和发布工作，将最终包复制到远程仓库以便分享给其他开发人员。</span>
+<span class="n">site</span><span class="p">(</span><span class="err">站点</span><span class="p">)</span>
+<span class="n">pre</span><span class="o">-</span><span class="n">site</span> <span class="o">-</span> <span class="err">执行一些生成项目站点前的准备工作。</span>
+<span class="n">site</span> <span class="o">-</span> <span class="err">生成项目站点的文档。</span>
+<span class="n">post</span><span class="o">-</span><span class="n">site</span> <span class="o">-</span> <span class="err">执行需完成站点生成的工作，如站点部署的准备工作。</span>
+<span class="n">site</span><span class="o">-</span><span class="n">deploy</span> <span class="o">-</span> <span class="err">向制定的</span><span class="n">web</span><span class="err">服务器部署站点生成文件。</span>
+</code></pre>
+</div>
+
+
+                <hr>
+		<p>转载请注明出处，本文地址:<a href="http://xhuiinit.github.io//blog/maven/2016/05/05/maven/">http://xhuiinit.github.io//blog/maven/2016/05/05/maven/</a></p>
+
+                
+                <!-- 多说 Share start -->
+                </style>
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/blog/maven/2016/05/05/maven"
+                    data-title="intellij idea15 + maven使用"
+                    data-url="http://xhuiinit.github.io//blog/maven/2016/05/05/maven/"
+                    data-images="http://xhuiinit.github.io//images/home-bg.jpg"
+                    data-content="
+  简单使用    
+      安装JDK
+      安装maven
+      安装intellij idea
+      一个简单的maven实... | JAVA开发、架构 " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/blog/jekyll/2016/04/29/20160429153210/" data-toggle="tooltip" data-placement="top" title="windows环境下安装jekyll开发环境">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/blog/maven/2016/05/05/maven.md/" data-toggle="tooltip" data-placement="top" title="intellij idea15 + maven使用">Next Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/blog/maven/2016/05/05/maven"
+                        data-title="intellij idea15 + maven使用"
+                        data-url="http://xhuiinit.github.io//blog/maven/2016/05/05/maven/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+                
+
+                
+
+            </div>
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+                				<a href="/tags/#redis" title="redis" rel="1">
+                                    redis
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#jekyll" title="jekyll" rel="2">
+                                    jekyll
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#技术" title="技术" rel="1">
+                                    技术
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#maven" title="maven" rel="2">
+                                    maven
+                                </a>
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                        <li><a href="http://xhuiinit.github.io">init's blog</a></li>
+                    
+                        <li><a href="#">friend</a></li>
+                    
+                        <li><a href="#">It helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    // dynamic User by Hux
+    var _user = 'xhui';
+
+    // duoshuo comment query.
+    var duoshuoQuery = {short_name: _user };
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<!-- 多说公共JS代码 end -->
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("http://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+                    
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/zhang-xiang-51-86">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+
+
+                    
+                    
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; 拉风二大爷 2016
+                    <br>
+                    Theme by Hux
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/javascripts/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/javascripts/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/javascripts/hux-blog.min.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- Highlight.js -->
+<script>
+    async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+        hljs.initHighlightingOnLoad();
+    })
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/javascripts/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+<link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+
+<!--fastClick.js -->
+<script>
+    async("http://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'http://xhuiinit.github.io';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = '040ab86f3ffe91c85aa1eafa18c124c0';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="/images/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

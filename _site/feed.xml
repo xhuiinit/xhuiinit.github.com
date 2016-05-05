@@ -5,9 +5,589 @@
     <description></description>
     <link>http://xhuiinit.github.io//</link>
     <atom:link href="http://xhuiinit.github.io//feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Wed, 04 May 2016 18:03:51 +0800</pubDate>
-    <lastBuildDate>Wed, 04 May 2016 18:03:51 +0800</lastBuildDate>
+    <pubDate>Thu, 05 May 2016 16:31:16 +0800</pubDate>
+    <lastBuildDate>Thu, 05 May 2016 16:31:16 +0800</lastBuildDate>
     <generator>Jekyll v3.1.3</generator>
+    
+      <item>
+        <title>intellij idea15 + maven使用</title>
+        <description>* TOC
+{:toc}
+
+Maven项目对象模型(POM)，可以通过一小段描述信息来管理项目的构建，报告和文档的软件项目管理工具。
+
+## 简单使用
+
+工欲善其事，必先利其器。笔者用的是64位windows系统，下载安装相应的软件：
+
+### 安装JDK
+这里笔者用的是jdk1.7,下载地址：&lt;a href=&quot;http://pan.baidu.com/s/1pLd6zz1&quot;&gt;http://pan.baidu.com/s/1pLd6zz1&lt;/a&gt;
+
+### 安装maven
+下载maven，&lt;a href=&quot;http://pan.baidu.com/s/1hsNfUCG&quot;&gt;http://pan.baidu.com/s/1hsNfUCG&lt;/a&gt;，解压安装
+
+设置环境变量，`MAVEN_HOME`,如：D:\WORKING\apache-maven-3.2.5，设置到`PATH`中
+
+校验是否安装成功
+
+```ruby
+C:\Users\Administrator&gt;mvn -v
+Apache Maven 3.2.5 (12a6b3acb947671f09b81f49094c53f426d8cea1; 2014-12-15T01:29:2
+3+08:00)
+Maven home: D:\WORKING\apache-maven-3.2.5\bin\..
+Java version: 1.7.0_55, vendor: Oracle Corporation
+Java home: D:\WORKING\JAVA\jdk1.7\jre
+Default locale: zh_CN, platform encoding: GBK
+OS name: &quot;windows 8.1&quot;, version: &quot;6.3&quot;, arch: &quot;amd64&quot;, family: &quot;windows&quot;
+```
+
+### 安装intellij idea
+下载intellij idea15,下载地址 &lt;a href=&quot;http://pan.baidu.com/s/1hsNfUCG&quot;&gt;http://pan.baidu.com/s/1dFa2wyX&lt;/a&gt;，解压安装，注册时选择“License server”输入“http://15.idea.lanyus.com/”点击“OK”即可快速激活
+
+### 一个简单的maven实例
+打开刚刚安装的intellij idea，新建Module，这里我们以创建一个`web`项目为例
+&lt;img src=&quot;/images/maven/A017E6A0997FF1C210091D7CCD9030AE.png&quot; alt=&quot;New Module&quot;/&gt;
+选择JDK版本，选中`maven-archetype-webapp`，点**next**；
+&lt;img src=&quot;/images/maven/53A2F4034A083DE8D4E5622249CD823C.png&quot; alt=&quot;New Module&quot;/&gt;
+填写`GroupId`和`ArtifactId`，版本默认1.0-SNAPSHOT，点击**next**；
+&lt;img src=&quot;/images/maven/2385850B1D9FD2682DC4E9E888AC02F7.png&quot; alt=&quot;New Module&quot;/&gt;
+选择`Maven home`路径，选择`settings`和`repository`，点击**next**；
+&lt;img src=&quot;/images/maven/D71C166A06A6A544BF709B5E0D61C1EB.png&quot; alt=&quot;New Module&quot;/&gt;
+点击**finsh**，这时就生成了一个`maven web`工程。
+&lt;img src=&quot;/images/maven/393C637B36FB93912AFB6214AFCDAFA9.png&quot; alt=&quot;New Module&quot;/&gt;
+然后可在该界面`clean`，`install`等
+
+## 管理本地仓库及远端仓库
+
+### 本地仓库
+在settings中加入`&lt;localRepository&gt;`
+`C:\Users\Administrator\.m2\repository``&lt;/localRepository&gt;`，既本地仓库
+
+### 远端仓库
+在mirrors节点下加入
+
+```ruby
+&lt;mirror&gt;
+  &lt;id&gt;nexus&lt;/id&gt;
+  &lt;mirrorOf&gt;central&lt;/mirrorOf&gt;
+  &lt;name&gt;central Repo&lt;/name&gt;
+  &lt;url&gt;http://domain:port/nexus/content/groups/public/&lt;/url&gt;
+&lt;/mirror&gt;
+```
+`&lt;mirrorOf&gt;central&lt;/mirrorOf&gt;`表示只为central仓库做镜像
+
+如果想为所有的仓库做镜像那么可以改为`&lt;mirrorOf&gt;*&lt;/mirrorOf&gt;`
+
+`&lt;url&gt;`为具体的远端仓库地址，笔者使用的Nexus架设私服。
+
+### 中央远端仓库
+当我们创建一个简单的Maven项目后(只需要在pom.xml配置好依赖)，
+运行mvn clean install就可以把项目构建好，不需要我们手工下载任何jar，
+这全靠中央仓库的存在，它会自动从仓库下载。
+这个仓库的定义是在`${M2_HOME}/lib/maven-2.0.10-uber.jar` 里面。
+你可以在里面找到`\org\apache\maven\project\pom-4.0.0.xml` 这个文件，
+在这个文件里面定义了默认中央仓库的地址：
+
+```ruby
+&lt;repositories&gt;        
+  &lt;repository&gt;        
+    &lt;id&gt; central&lt;/id&gt;        
+    &lt;name&gt; Maven Repository Switchboard&lt;/name&gt;        
+    &lt;layout&gt; default&lt;/layout&gt;        
+    &lt;url&gt; http://repo1.maven.org/maven2&lt;/url&gt;        
+    &lt;snapshots&gt;        
+      &lt;enabled&gt; false&lt;/enabled&gt;        
+    &lt;/snapshots&gt;        
+  &lt;/repository&gt;        
+&lt;/repositories&gt;
+```
+这里推荐一个很好的仓库，&lt;a href=&quot;&gt;http://mvnrepository.com/&quot;&gt;http://mvnrepository.com/&lt;/a&gt; ，相信地球人都知道这个。
+
+## maven配置详解
+先来说说settings.xml，settings.xml对于maven来说相当于全局性的配置，用于所有的项目。在maven中存在两个settings.xml，
+一个位于maven的安装目录conf下面，作为全局性配置。
+对于团队设置，保持一致的定义是关键，所以maven/conf下面的settings.xml就作为团队共同的配置文件。
+保证所有的团队成员都拥有相同的配置。当然对于每个成员，都需要特殊的自定义设置，如用户信息，所以另外一个settings.xml就作为本地配置。
+默认的位置为：${user.dir}/.m2/settings.xml目录中（${user.dir} 指windows 中的用户目录）。
+settings.xml基本结构如下：
+
+```ruby
+&lt;settings xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+          xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+          xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&gt;
+  &lt;localRepository/&gt;
+  &lt;interactiveMode/&gt;
+  &lt;usePluginRegistry/&gt;
+  &lt;offline/&gt;
+  &lt;pluginGroups/&gt;
+  &lt;servers/&gt;
+  &lt;mirrors/&gt;
+  &lt;proxies/&gt;
+  &lt;profiles/&gt;
+  &lt;activeProfiles/&gt;
+&lt;/settings&gt;
+```
+简单介绍一下几个主要的配置因素：
+
+* localRepository：表示本地库的保存位置，也就是maven2主要的jar保存位置，默认在${user.dir}/.m2/repository，如果需要另外设置，就换成其他的路径。
+
+* offline：如果不想每次编译，都去查找远程中心库，那就设置为true。当然前提是你已经下载了必须的依赖包。
+
+* servers：在POM中的 distributionManagement元素定义了开发库。然而，特定的username和pwd不能使用于pom.xml，所以通过此配置来保存server信息
+
+* Mirrors：表示镜像库，指定库的镜像，用于增加其他库
+
+* proxies：此设置，主要用于无法直接访问中心的库用户配置
+
+* profiles：类似于pom.xml中的profile元素，主要包括activation,repositories,pluginRepositories 和properties元素 
+
+* repositories 和pluginRepositories：定义其他开发库和插件开发库。对于团队来说，肯定有自己的开发库。可以通过此配置来定义
+
+* properties：maven 的properties作为placeholder值，如ant的properties。包括以下的5种类型值：
+  + env，返回当前的环境变量
+  + project.x，返回pom中定义的元素值，如project.version
+  + settings.x，返回settings.xml中定义的元素
+  + java系统属性，所有经过java.lang.System.getProperties()返回的值
+  + x，用户自己设定的值
+* activation：用于激活此profile
+  + jdk:如果匹配指定的jdk版本，将会激活
+  + os:操作系统
+  + property：如果maven能检测到相应的属性
+  + file: 用于判断文件是否存在或者不存在
+
+* active profiles：除了使用activation来激活profile，同样可以通过activeProfiles来激活
+
+## maven多模块管理
+可以使用Maven来管理多个项目，首先是添加一个父pom.xml 文件，其中父pom.xml 的packaging 必须为 pom 类型。
+此时可以把需管理的项目的共用的dependencies ,plugin 移动到这个父pom.xml ，然后使用modules 添加到父pom.xml 中。
+
+```ruby
+&lt;modules&gt;
+  &lt;module&gt;childProject&lt;/module&gt;
+&lt;/modules&gt;
+```
+修改子项目的pom.xml ，添加一个parent 元素
+
+```ruby
+&lt;parent&gt;
+    &lt;artifactId&gt;parentProject&lt;/artifactId&gt;
+    &lt;groupId&gt;com.test&lt;/groupId&gt;
+    &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+    &lt;relativePath&gt;../&lt;/relativePath&gt;
+&lt;/parent&gt;
+```
+
+## maven deploy
+玩过 maven 私服的都知道这个玩意，在本地的 pom 文件里做好配置，执行下 maven 的 deploy 即可把新的 jar/war等 部署到私服上，pom中添加以下配置
+
+```ruby
+&lt;distributionManagement&gt;
+  &lt;repository&gt;
+    &lt;id&gt;releases&lt;/id&gt;
+    &lt;name&gt;Nexus Release Repository&lt;/name&gt;
+    &lt;url&gt;http://domain:port/xxx/releases/&lt;/url&gt;
+  &lt;/repository&gt;
+  &lt;snapshotRepository&gt;
+    &lt;id&gt;snapshots&lt;/id&gt;
+    &lt;name&gt;Nexus Snapshot Repository&lt;/name&gt;
+    &lt;url&gt; http://domain:port/xxx/snapshots/&lt;/url&gt;
+  &lt;/snapshotRepository&gt;
+&lt;/distributionManagement&gt;
+```
+然后maven/conf下的settings中的servers节点加入如下配置：
+
+```ruby
+&lt;server&gt;
+  &lt;id&gt;releases&lt;/id&gt;
+  &lt;username&gt;username&lt;/username&gt;
+  &lt;password&gt;password&lt;/password&gt;
+&lt;/server&gt;
+&lt;server&gt;
+  &lt;id&gt;snapshots&lt;/id&gt;
+  &lt;username&gt; username &lt;/username&gt;
+  &lt;password&gt; password &lt;/password&gt;
+&lt;/server&gt;
+```
+
+## maven常用命令
+下面列举一些maven的常用命令，至于具体情况可谷歌或者度娘
+
+```ruby
+mvn archetype：create 创建Maven项目
+mvn compile 编译源代码
+mvn deploy 发布项目
+mvn test-compile 编译测试源代码
+mvn test 运行应用程序中的单元测试
+mvn site 生成项目相关信息的网站
+mvn clean 清除项目目录中的生成结果
+mvn package 根据项目生成的jar
+mvn install 在本地Repository中安装jar
+mvn eclipse:eclipse 生成eclipse项目文件
+mvnjetty:run 启动jetty服务
+mvntomcat:run 启动tomcat服务
+mvn clean package -Dmaven.test.skip=true:清除以前的包后重新打包，跳过测试
+```
+
+## maven生命周期
+Maven的生命周期是为了对所有的构建过程进行了抽象了，便于统一。
+
+```ruby
+clean(清理)
+此生命周期旨在给工程做清理工作，它主要包含以下阶段：
+pre-clean - 执行项目清理前所需要的工作。
+clean - 清理上一次build项目生成的文件。
+post-clean - 执行完成项目清理所需的工作.
+default(默认)
+validate - 验证项目是否正确且所有必要的信息都可用。
+initialize - 初始化构建工作，如：设置参数，创建目录等。
+generate-sources - 为包含在编译范围内的代码生成源代码.
+process-sources - 处理源代码, 如过滤值.
+generate-resources -
+process-resources - 复制并处理资源文件，至目标目录，准备打包。
+compile - 编译项目中的源代码.
+process-classes - 为编译生成的文件做后期工作, 例如做Java类的字节码增强.
+generate-test-sources - 为编译内容生成测试源代码.
+process-test-sources - 处理测试源代码。
+generate-test-resources -
+process-test-resources - 复制并处理资源文件，至目标测试目录。
+test-compile - 将需测试源代码编译到路径。一般来说，
+是编译/src/test/java目录下的java文件至目标输出的测试classpath目录中。
+process-test-classes -
+test - 使用合适的单元测试框架运行测试。这些测试代码不会被打包或部署。
+prepare-package -
+package - 接受编译好的代码，打包成可发布的格式，如 JAR 。
+pre-integration-test -
+integration-test - 按需求将发布包部署到运行环境。
+post-integration-test -
+verify -
+install -将包安装到本地仓库，给其他本地引用提供依赖。
+deploy -完成集成和发布工作，将最终包复制到远程仓库以便分享给其他开发人员。
+site(站点)
+pre-site - 执行一些生成项目站点前的准备工作。
+site - 生成项目站点的文档。
+post-site - 执行需完成站点生成的工作，如站点部署的准备工作。
+site-deploy - 向制定的web服务器部署站点生成文件。
+```</description>
+        <pubDate>Thu, 05 May 2016 12:31:43 +0800</pubDate>
+        <link>http://xhuiinit.github.io//blog/maven/2016/05/05/maven.md/</link>
+        <guid isPermaLink="true">http://xhuiinit.github.io//blog/maven/2016/05/05/maven.md/</guid>
+        
+        <category>maven</category>
+        
+        
+        <category>blog</category>
+        
+        <category>maven</category>
+        
+      </item>
+    
+      <item>
+        <title>intellij idea15 + maven使用</title>
+        <description>&lt;ul id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#section&quot; id=&quot;markdown-toc-section&quot;&gt;简单使用&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#jdk&quot; id=&quot;markdown-toc-jdk&quot;&gt;安装JDK&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#maven&quot; id=&quot;markdown-toc-maven&quot;&gt;安装maven&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#intellij-idea&quot; id=&quot;markdown-toc-intellij-idea&quot;&gt;安装intellij idea&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#maven-1&quot; id=&quot;markdown-toc-maven-1&quot;&gt;一个简单的maven实例&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#section-1&quot; id=&quot;markdown-toc-section-1&quot;&gt;管理本地仓库及远端仓库&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#section-2&quot; id=&quot;markdown-toc-section-2&quot;&gt;本地仓库&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#section-3&quot; id=&quot;markdown-toc-section-3&quot;&gt;远端仓库&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#section-4&quot; id=&quot;markdown-toc-section-4&quot;&gt;中央远端仓库&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#maven-2&quot; id=&quot;markdown-toc-maven-2&quot;&gt;maven配置详解&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#maven-3&quot; id=&quot;markdown-toc-maven-3&quot;&gt;maven多模块管理&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#maven-deploy&quot; id=&quot;markdown-toc-maven-deploy&quot;&gt;maven deploy&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#maven-4&quot; id=&quot;markdown-toc-maven-4&quot;&gt;maven常用命令&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#maven-5&quot; id=&quot;markdown-toc-maven-5&quot;&gt;maven生命周期&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Maven项目对象模型(POM)，可以通过一小段描述信息来管理项目的构建，报告和文档的软件项目管理工具。&lt;/p&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;简单使用&lt;/h2&gt;
+
+&lt;p&gt;工欲善其事，必先利其器。笔者用的是64位windows系统，下载安装相应的软件：&lt;/p&gt;
+
+&lt;h3 id=&quot;jdk&quot;&gt;安装JDK&lt;/h3&gt;
+&lt;p&gt;这里笔者用的是jdk1.7,下载地址：&lt;a href=&quot;http://pan.baidu.com/s/1pLd6zz1&quot;&gt;http://pan.baidu.com/s/1pLd6zz1&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;maven&quot;&gt;安装maven&lt;/h3&gt;
+&lt;p&gt;下载maven，&lt;a href=&quot;http://pan.baidu.com/s/1hsNfUCG&quot;&gt;http://pan.baidu.com/s/1hsNfUCG&lt;/a&gt;，解压安装&lt;/p&gt;
+
+&lt;p&gt;设置环境变量，&lt;code class=&quot;highlighter-rouge&quot;&gt;MAVEN_HOME&lt;/code&gt;,如：D:\WORKING\apache-maven-3.2.5，设置到&lt;code class=&quot;highlighter-rouge&quot;&gt;PATH&lt;/code&gt;中&lt;/p&gt;
+
+&lt;p&gt;校验是否安装成功&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;no&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:\&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Users&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Administrator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mvn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;
+&lt;span class=&quot;no&quot;&gt;Apache&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Maven&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a6b3acb947671f09b81f49094c53f426d8cea1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2014&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;T01&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;29&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;08&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;00&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;no&quot;&gt;Maven&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;home: &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:\&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;WORKING&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;apache&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maven&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;\.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;no&quot;&gt;Java&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;version: &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;0_55&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;vendor: &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Oracle&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Corporation&lt;/span&gt;
+&lt;span class=&quot;no&quot;&gt;Java&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;home: &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:\&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;WORKING&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;JAVA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jdk1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jre&lt;/span&gt;
+&lt;span class=&quot;no&quot;&gt;Default&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;locale: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;zh_CN&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;platform&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;encoding: &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;GBK&lt;/span&gt;
+&lt;span class=&quot;no&quot;&gt;OS&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;name: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;windows 8.1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;version: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;6.3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;arch: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;amd64&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;family: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;windows&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;intellij-idea&quot;&gt;安装intellij idea&lt;/h3&gt;
+&lt;p&gt;下载intellij idea15,下载地址 &lt;a href=&quot;http://pan.baidu.com/s/1hsNfUCG&quot;&gt;http://pan.baidu.com/s/1dFa2wyX&lt;/a&gt;，解压安装，注册时选择“License server”输入“http://15.idea.lanyus.com/”点击“OK”即可快速激活&lt;/p&gt;
+
+&lt;h3 id=&quot;maven-1&quot;&gt;一个简单的maven实例&lt;/h3&gt;
+&lt;p&gt;打开刚刚安装的intellij idea，新建Module，这里我们以创建一个&lt;code class=&quot;highlighter-rouge&quot;&gt;web&lt;/code&gt;项目为例
+&lt;img src=&quot;/images/maven/A017E6A0997FF1C210091D7CCD9030AE.png&quot; alt=&quot;New Module&quot; /&gt;
+选择JDK版本，选中&lt;code class=&quot;highlighter-rouge&quot;&gt;maven-archetype-webapp&lt;/code&gt;，点&lt;strong&gt;next&lt;/strong&gt;；
+&lt;img src=&quot;/images/maven/53A2F4034A083DE8D4E5622249CD823C.png&quot; alt=&quot;New Module&quot; /&gt;
+填写&lt;code class=&quot;highlighter-rouge&quot;&gt;GroupId&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;ArtifactId&lt;/code&gt;，版本默认1.0-SNAPSHOT，点击&lt;strong&gt;next&lt;/strong&gt;；
+&lt;img src=&quot;/images/maven/2385850B1D9FD2682DC4E9E888AC02F7.png&quot; alt=&quot;New Module&quot; /&gt;
+选择&lt;code class=&quot;highlighter-rouge&quot;&gt;Maven home&lt;/code&gt;路径，选择&lt;code class=&quot;highlighter-rouge&quot;&gt;settings&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;repository&lt;/code&gt;，点击&lt;strong&gt;next&lt;/strong&gt;；
+&lt;img src=&quot;/images/maven/D71C166A06A6A544BF709B5E0D61C1EB.png&quot; alt=&quot;New Module&quot; /&gt;
+点击&lt;strong&gt;finsh&lt;/strong&gt;，这时就生成了一个&lt;code class=&quot;highlighter-rouge&quot;&gt;maven web&lt;/code&gt;工程。
+&lt;img src=&quot;/images/maven/393C637B36FB93912AFB6214AFCDAFA9.png&quot; alt=&quot;New Module&quot; /&gt;
+然后可在该界面&lt;code class=&quot;highlighter-rouge&quot;&gt;clean&lt;/code&gt;，&lt;code class=&quot;highlighter-rouge&quot;&gt;install&lt;/code&gt;等&lt;/p&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;管理本地仓库及远端仓库&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;本地仓库&lt;/h3&gt;
+&lt;p&gt;在settings中加入&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;localRepository&amp;gt;&lt;/code&gt;
+&lt;code class=&quot;highlighter-rouge&quot;&gt;C:\Users\Administrator\.m2\repository&lt;/code&gt;
+&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;/localRepository&amp;gt;&lt;/code&gt;，既本地仓库&lt;/p&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;远端仓库&lt;/h3&gt;
+&lt;p&gt;在mirrors节点下加入&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mirror&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nexus&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/id&amp;gt;
+  &amp;lt;mirrorOf&amp;gt;central&amp;lt;/mi&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rrorOf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;central&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Repo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/name&amp;gt;
+  &amp;lt;url&amp;gt;http:/&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nexus&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;groups&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/&amp;lt;/u&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/mirror&amp;gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;mirrorOf&amp;gt;central&amp;lt;/mirrorOf&amp;gt;&lt;/code&gt;表示只为central仓库做镜像&lt;/p&gt;
+
+&lt;p&gt;如果想为所有的仓库做镜像那么可以改为&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;mirrorOf&amp;gt;*&amp;lt;/mirrorOf&amp;gt;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;url&amp;gt;&lt;/code&gt;为具体的远端仓库地址，笔者使用的Nexus架设私服。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-4&quot;&gt;中央远端仓库&lt;/h3&gt;
+&lt;p&gt;当我们创建一个简单的Maven项目后(只需要在pom.xml配置好依赖)，
+运行mvn clean install就可以把项目构建好，不需要我们手工下载任何jar，
+这全靠中央仓库的存在，它会自动从仓库下载。
+这个仓库的定义是在&lt;code class=&quot;highlighter-rouge&quot;&gt;${M2_HOME}/lib/maven-2.0.10-uber.jar&lt;/code&gt; 里面。
+你可以在里面找到&lt;code class=&quot;highlighter-rouge&quot;&gt;\org\apache\maven\project\pom-4.0.0.xml&lt;/code&gt; 这个文件，
+在这个文件里面定义了默认中央仓库的地址：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;repositories&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;        
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;repository&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;        
+    &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;central&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/id&amp;gt;        
+    &amp;lt;name&amp;gt; Maven Repository Switchboard&amp;lt;/n&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;        
+    &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;layout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;default&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/layout&amp;gt;        
+    &amp;lt;url&amp;gt; http:/&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;repo1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;maven&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maven2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/url&amp;gt;        
+    &amp;lt;snapshots&amp;gt;        
+      &amp;lt;enabled&amp;gt; false&amp;lt;/en&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;abled&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;        
+    &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/snapshots&amp;gt;        
+  &amp;lt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;repository&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;        
+&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/repositories&amp;gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;这里推荐一个很好的仓库，&lt;a href=&quot;&amp;gt;http://mvnrepository.com/&quot;&gt;http://mvnrepository.com/&lt;/a&gt; ，相信地球人都知道这个。&lt;/p&gt;
+
+&lt;h2 id=&quot;maven-2&quot;&gt;maven配置详解&lt;/h2&gt;
+&lt;p&gt;先来说说settings.xml，settings.xml对于maven来说相当于全局性的配置，用于所有的项目。在maven中存在两个settings.xml，
+一个位于maven的安装目录conf下面，作为全局性配置。
+对于团队设置，保持一致的定义是关键，所以maven/conf下面的settings.xml就作为团队共同的配置文件。
+保证所有的团队成员都拥有相同的配置。当然对于每个成员，都需要特殊的自定义设置，如用户信息，所以另外一个settings.xml就作为本地配置。
+默认的位置为：${user.dir}/.m2/settings.xml目录中（${user.dir} 指windows 中的用户目录）。
+settings.xml基本结构如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;settings&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xmlns&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;http://maven.apache.org/POM/4.0.0&quot;&lt;/span&gt;
+          &lt;span class=&quot;n&quot;&gt;xmlns&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:xsi&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&lt;/span&gt;
+          &lt;span class=&quot;n&quot;&gt;xsi&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:schemaLocation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;localRepository&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;interactiveMode&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;usePluginRegistry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;offline&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pluginGroups&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;servers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mirrors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;proxies&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;profiles&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;activeProfiles&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/settings&amp;gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;简单介绍一下几个主要的配置因素：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;localRepository：表示本地库的保存位置，也就是maven2主要的jar保存位置，默认在${user.dir}/.m2/repository，如果需要另外设置，就换成其他的路径。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;offline：如果不想每次编译，都去查找远程中心库，那就设置为true。当然前提是你已经下载了必须的依赖包。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;servers：在POM中的 distributionManagement元素定义了开发库。然而，特定的username和pwd不能使用于pom.xml，所以通过此配置来保存server信息&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Mirrors：表示镜像库，指定库的镜像，用于增加其他库&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;proxies：此设置，主要用于无法直接访问中心的库用户配置&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;profiles：类似于pom.xml中的profile元素，主要包括activation,repositories,pluginRepositories 和properties元素&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;repositories 和pluginRepositories：定义其他开发库和插件开发库。对于团队来说，肯定有自己的开发库。可以通过此配置来定义&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;properties：maven 的properties作为placeholder值，如ant的properties。包括以下的5种类型值：
+    &lt;ul&gt;
+      &lt;li&gt;env，返回当前的环境变量&lt;/li&gt;
+      &lt;li&gt;project.x，返回pom中定义的元素值，如project.version&lt;/li&gt;
+      &lt;li&gt;settings.x，返回settings.xml中定义的元素&lt;/li&gt;
+      &lt;li&gt;java系统属性，所有经过java.lang.System.getProperties()返回的值&lt;/li&gt;
+      &lt;li&gt;x，用户自己设定的值&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;activation：用于激活此profile
+    &lt;ul&gt;
+      &lt;li&gt;jdk:如果匹配指定的jdk版本，将会激活&lt;/li&gt;
+      &lt;li&gt;os:操作系统&lt;/li&gt;
+      &lt;li&gt;property：如果maven能检测到相应的属性&lt;/li&gt;
+      &lt;li&gt;file: 用于判断文件是否存在或者不存在&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;active profiles：除了使用activation来激活profile，同样可以通过activeProfiles来激活&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;maven-3&quot;&gt;maven多模块管理&lt;/h2&gt;
+&lt;p&gt;可以使用Maven来管理多个项目，首先是添加一个父pom.xml 文件，其中父pom.xml 的packaging 必须为 pom 类型。
+此时可以把需管理的项目的共用的dependencies ,plugin 移动到这个父pom.xml ，然后使用modules 添加到父pom.xml 中。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;modules&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;childProject&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/module&amp;gt;
+&amp;lt;/mo&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dules&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;修改子项目的pom.xml ，添加一个parent 元素&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;artifactId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parentProject&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/artifactId&amp;gt;
+    &amp;lt;groupId&amp;gt;com.test&amp;lt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;groupId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;version&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;SNAPSHOT&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/version&amp;gt;
+    &amp;lt;relativePath&amp;gt;../&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/relativePath&amp;gt;
+&amp;lt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;maven-deploy&quot;&gt;maven deploy&lt;/h2&gt;
+&lt;p&gt;玩过 maven 私服的都知道这个玩意，在本地的 pom 文件里做好配置，执行下 maven 的 deploy 即可把新的 jar/war等 部署到私服上，pom中添加以下配置&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;distributionManagement&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;repository&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;releases&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/id&amp;gt;
+    &amp;lt;name&amp;gt;Nexus Release Repository&amp;lt;/n&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:/&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xxx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;releases&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/url&amp;gt;
+  &amp;lt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;repository&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;snapshotRepository&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;snapshots&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/id&amp;gt;
+    &amp;lt;name&amp;gt;Nexus Snapshot Repository&amp;lt;/n&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:/&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xxx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;snapshots&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/url&amp;gt;
+  &amp;lt;/sn&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;apshotRepository&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/distributionManagement&amp;gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;然后maven/conf下的settings中的servers节点加入如下配置：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;releases&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/id&amp;gt;
+  &amp;lt;username&amp;gt;username&amp;lt;/use&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rname&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;password&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;password&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/password&amp;gt;
+&amp;lt;/se&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rver&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;snapshots&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/id&amp;gt;
+  &amp;lt;username&amp;gt; username &amp;lt;/use&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rname&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;password&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;password&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/password&amp;gt;
+&amp;lt;/se&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rver&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;maven-4&quot;&gt;maven常用命令&lt;/h2&gt;
+&lt;p&gt;下面列举一些maven的常用命令，至于具体情况可谷歌或者度娘&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;mvn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;archetype&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;：&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;create&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;创建&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Maven&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;项目&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mvn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;编译源代码&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mvn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deploy&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;发布项目&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mvn&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;编译测试源代码&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mvn&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;运行应用程序中的单元测试&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mvn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;site&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;生成项目相关信息的网站&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mvn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clean&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;清除项目目录中的生成结果&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mvn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;根据项目生成的&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jar&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mvn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;在本地&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Repository&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;中安装&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jar&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mvn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;eclipse&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:eclipse&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;生成&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;eclipse&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;项目文件&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mvnjetty&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:run&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;启动&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jetty&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;服务&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mvntomcat&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:run&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;启动&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tomcat&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;服务&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;mvn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clean&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Dmaven&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;skip&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;清除以前的包后重新打包，跳过测试&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;maven-5&quot;&gt;maven生命周期&lt;/h2&gt;
+&lt;p&gt;Maven的生命周期是为了对所有的构建过程进行了抽象了，便于统一。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;clean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;清理&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;此生命周期旨在给工程做清理工作，它主要包含以下阶段：&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pre&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;clean&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;执行项目清理前所需要的工作。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;clean&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;清理上一次&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;build&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;项目生成的文件。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;clean&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;执行完成项目清理所需的工作&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;default&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;默认&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;validate&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;验证项目是否正确且所有必要的信息都可用。&lt;/span&gt;
+&lt;span class=&quot;kp&quot;&gt;initialize&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;初始化构建工作，如：设置参数，创建目录等。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;generate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sources&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;为包含在编译范围内的代码生成源代码&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;process&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sources&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;处理源代码&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;如过滤值&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;generate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resources&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;process&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resources&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;复制并处理资源文件，至目标目录，准备打包。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;编译项目中的源代码&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;process&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;classes&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;为编译生成的文件做后期工作&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;例如做&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Java&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;类的字节码增强&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;generate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sources&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;为编译内容生成测试源代码&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;nf&quot;&gt;process&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sources&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;处理测试源代码。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;generate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resources&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;process&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resources&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;复制并处理资源文件，至目标测试目录。&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;compile&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;将需测试源代码编译到路径。一般来说，&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;是编译&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;java&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;目录下的&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;java&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;文件至目标输出的测试&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;classpath&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;目录中。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;process&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;classes&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;使用合适的单元测试框架运行测试。这些测试代码不会被打包或部署。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;prepare&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;接受编译好的代码，打包成可发布的格式，如&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;JAR&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pre&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;integration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;integration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;按需求将发布包部署到运行环境。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;integration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;verify&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;将包安装到本地仓库，给其他本地引用提供依赖。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;deploy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;完成集成和发布工作，将最终包复制到远程仓库以便分享给其他开发人员。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;site&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;站点&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pre&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;site&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;执行一些生成项目站点前的准备工作。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;site&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;生成项目站点的文档。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;site&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;执行需完成站点生成的工作，如站点部署的准备工作。&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;site&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deploy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;向制定的&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;web&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;服务器部署站点生成文件。&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</description>
+        <pubDate>Thu, 05 May 2016 12:31:43 +0800</pubDate>
+        <link>http://xhuiinit.github.io//blog/maven/2016/05/05/maven/</link>
+        <guid isPermaLink="true">http://xhuiinit.github.io//blog/maven/2016/05/05/maven/</guid>
+        
+        <category>maven</category>
+        
+        
+        <category>blog</category>
+        
+        <category>maven</category>
+        
+      </item>
     
       <item>
         <title>windows环境下安装jekyll开发环境</title>

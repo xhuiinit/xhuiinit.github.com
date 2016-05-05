@@ -85,3 +85,6 @@ friends: [
         href: "#"
     }
 ]
+
+localhost-root-path: http://localhost:4000
+remote-root-path: http://http://xhuiinit.github.io
